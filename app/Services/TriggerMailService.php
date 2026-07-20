@@ -72,6 +72,6 @@ class TriggerMailService
             $ok ? $sent++ : $failed++;
         }
 
-return compact('sent','failed','skipped');
+        return compact('sent', 'failed', 'skipped');
     }
 }

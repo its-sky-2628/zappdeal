@@ -467,16 +467,22 @@ async function loadProductsFromApi() {
             if (cartChanged) persistCart();
             
             // Re-resolve clean path route now that products are loaded from API
+            // Only navigate if the resolved view differs from current view to avoid
+            // unnecessary scroll-to-top triggers during background polling.
             const pathView = resolvePathRoute();
             if (pathView && state.view === "home" && !(pathView === "home" && window.location.hash)) {
-                setView(pathView, true);
+                if (pathView !== state.view) {
+                    setView(pathView, true);
+                }
                 return;
             }
             const legacyView = parseHashView();
             if (legacyView === "product" && state.productId && state.view === "home") {
                 const legacyProduct = products.find(product => String(product.id) === String(state.productId));
                 if (legacyProduct) {
-                    setView("product", true);
+                    if (state.view !== "product") {
+                        setView("product", true);
+                    }
                     history.replaceState(null, "", canonicalUrlForView("product"));
                     return;
                 }
@@ -6950,22 +6956,22 @@ function getPolicyContent(tab) {
         <h1>Frequently Asked Questions (FAQs)</h1>
         <p class="subtitle">Find quick answers</p>
         <div class="faq-accordion">
-          <div class="faq-item">
-            <h3>Can I cancel my order?</h3>
-            <p>No, once placed orders cannot be cancelled except approved cases.</p>
-          </div>
-          <div class="faq-item">
-            <h3>Can I return products?</h3>
-            <p>Only if delivered product differs from ordered product.</p>
-          </div>
-          <div class="faq-item">
-            <h3>How do I request replacement?</h3>
-            <p>Email support@zappdeal.com within 48 hours.</p>
-          </div>
-          <div class="faq-item">
-            <h3>How do referral rewards work?</h3>
-            <p>Rewards are credited after successful order completion.</p>
-          </div>
+      <div class="faq-item">
+        <h3>Can I cancel my order?</h3>
+        <p>Once your order has been shipped, it cannot be cancelled.</p>
+      </div>
+      <div class="faq-item">
+        <h3>Can I return a product?</h3>
+        <p>Yes, only if you receive a wrong or different product than what you ordered.</p>
+      </div>
+      <div class="faq-item">
+        <h3>How do I request a replacement?</h3>
+        <p>Email support@zappdeal.com within 24 hours of delivery with your order details and photos of the product.</p>
+      </div>
+      <div class="faq-item">
+        <h3>How do referral rewards work?</h3>
+        <p>Referral rewards are credited only after your referred user successfully completes their order.</p>
+      </div>
         </div>
       `;
     default:
@@ -7868,7 +7874,10 @@ function setView(view, fromHashChange = false) {
       window.searchSuggestionsManager.hide();
     }
   }
-  window.scrollTo({ top: 0, behavior: "smooth" });
+  // Only scroll to top on user-initiated navigation, not on polling/API re-renders
+  if (!fromHashChange && previousView !== view) {
+    window.scrollTo({ top: 0, behavior: "instant" });
+  }
 }
 
 function backTarget() {
@@ -8853,7 +8862,13 @@ if (state.urlReferralCode && !userIsAuth) {
 } else {
   const pathView = resolvePathRoute();
   if (pathView) {
-    setView(pathView, true);
+    // Avoid landing on empty cart/checkout pages on startup
+    const cartItemsCount = Object.keys(state.cart || {}).length;
+    if ((pathView === "cart" || pathView === "checkout") && cartItemsCount === 0) {
+      setView("home");
+    } else {
+      setView(pathView, true);
+    }
   } else {
     const initialView = parseHashView();
     if (initialView && views[initialView]) {
@@ -8870,6 +8885,7 @@ if (state.urlReferralCode && !userIsAuth) {
     } else {
       const relativePath = window.location.pathname.substring((window.APP_BASE_PATH || "/").replace(/\/$/, "").length) || "/";
       const waitingForProductData = !productsApiLoaded && (/^\/product\/[^/]+\/?$/.test(relativePath) || /^\/(?!account\/|policies\/|collections\/)[^/]+\/[^/]+\/?$/.test(relativePath));
+      // Prevent auto-redirecting to cart on landing - only go home
       setView("home", true);
       if (!waitingForProductData && (window.location.pathname !== appPath("/") || window.location.hash)) history.replaceState(null, "", appPath("/"));
     }
@@ -8894,13 +8910,19 @@ window.addEventListener("popstate", () => {
     return;
   }
 
-  const pathView = resolvePathRoute();
-  if (pathView) {
-    setView(pathView, true);
-  } else {
-    const next = parseHashView();
-    if (views[next]) setView(next, true);
-  }
+            const pathView = resolvePathRoute();
+            if (pathView && state.view === "home" && !(pathView === "home" && window.location.hash)) {
+                if (pathView !== state.view) {
+                    // Avoid landing on empty cart/checkout pages after API load
+                    const cartItemsCount = Object.keys(state.cart || {}).length;
+                    if ((pathView === "cart" || pathView === "checkout") && cartItemsCount === 0) {
+                        setView("home", true);
+                    } else {
+                        setView(pathView, true);
+                    }
+                }
+                return;
+            }
 });
 
 window.addEventListener("resize", () => {

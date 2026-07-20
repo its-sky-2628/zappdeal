@@ -50,7 +50,8 @@ class CashfreeService
             'status' => 'payment_pending',
             'payment_session_id' => $response->json('payment_session_id'),
             'cf_order_id' => $gatewayId,
-            'order_id' => $order->id,
+            'order_id' => $gatewayId,
+            'local_order_id' => $order->id,
             'mode' => config('services.cashfree.mode'),
         ];
     }

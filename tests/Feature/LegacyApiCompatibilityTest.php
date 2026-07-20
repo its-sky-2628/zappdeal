@@ -83,7 +83,7 @@ class LegacyApiCompatibilityTest extends TestCase
         $this->call('POST', '/api/payments/cashfree/webhook', [], [], [], $this->transformHeadersToServerVars($headers), $payload)->assertOk();
         $this->call('POST', '/api/payments/cashfree/webhook', [], [], [], $this->transformHeadersToServerVars($headers), $payload)->assertOk();
 
-        $this->assertDatabaseHas('orders',['id' => $order->id, 'status' => 'Pending']);
-        $this->assertDatabaseCount('payment_attempts',1);
+        $this->assertDatabaseHas('orders', ['id' => $order->id, 'status' => 'Pending']);
+        $this->assertDatabaseCount('payment_attempts', 1);
     }
 }

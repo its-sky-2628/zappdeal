@@ -51,7 +51,7 @@ class FinanceController extends Controller
                 $r->user()->payoutMethods()->update(['is_default' => false]);
             }
 
-return $r->user()->payoutMethods()->create($d);
+            return $r->user()->payoutMethods()->create($d);
         });
 
         return response()->json($m, 201);
@@ -79,7 +79,7 @@ return $r->user()->payoutMethods()->create($d);
             $r->user()->payoutMethods()->latest()->first()?->update(['is_default' => true]);
         }
 
-return response()->json(['message' => 'Payout method deleted successfully']);
+        return response()->json(['message' => 'Payout method deleted successfully']);
     }
 
     public function defaultMethod(Request $r, UserPayoutMethod $method): JsonResponse
@@ -122,6 +122,6 @@ return response()->json(['message' => 'Payout method deleted successfully']);
 
     private function owns(Request $r, UserPayoutMethod $m): void
     {
-        abort_unless($m->user_id === $r->user()->id,404);
+        abort_unless($m->user_id === $r->user()->id, 404);
     }
 }

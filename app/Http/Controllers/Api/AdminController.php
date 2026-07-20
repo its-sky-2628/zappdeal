@@ -92,7 +92,7 @@ class AdminController extends Controller
             IphoneModel::updateOrCreate(['name' => $row['name']], $row);
         }
 
-return response()->json(IphoneModel::all());
+        return response()->json(IphoneModel::all());
     }
 
     public function storeStyle(Request $r): JsonResponse
@@ -124,7 +124,7 @@ return response()->json(IphoneModel::all());
             ShopByStyle::create($row);
         }
 
-return response()->json(ShopByStyle::all());
+        return response()->json(ShopByStyle::all());
     }
 
     private function coupon(Request $r, bool $p = false): array

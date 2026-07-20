@@ -179,6 +179,6 @@ class OrderController extends Controller
             $data['product'] = ['id' => $o->product->id, 'name' => $o->product->name, 'price' => (int) $o->product->price, 'image' => $o->product->image];
         }
 
-return $data;
+        return $data;
     }
 }

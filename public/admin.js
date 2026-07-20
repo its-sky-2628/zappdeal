@@ -6084,6 +6084,8 @@ async function loadCurrentAdminFromApi() {
       localStorage.setItem("admin-current-user", JSON.stringify(adminData));
       const templateNav = document.getElementById("email-template-nav");
       if (templateNav) templateNav.style.display = adminData.is_super ? "flex" : "none";
+      const bulkOrdersNav = document.getElementById("bulk-orders-nav");
+      if (bulkOrdersNav) bulkOrdersNav.style.display = adminData.is_super ? "flex" : "none";
       
       // Update topbar profile details dynamically
       const profilePhoto = document.querySelector(".admin-profile .profile-photo");

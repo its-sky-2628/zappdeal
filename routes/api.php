@@ -14,6 +14,8 @@ use App\Models\Coupon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
+Route::prefix('mobile/v1')->group(base_path('routes/mobile.php'));
+
 Route::post('/register/send-otp', [AuthController::class, 'registerOtp'])->middleware('throttle:3,5');
 Route::post('/register/verify-otp', [AuthController::class, 'verifyRegistration'])->middleware('throttle:5,5');
 Route::post('/login', [AuthController::class, 'login'])->middleware('throttle:5,5');
@@ -102,7 +104,7 @@ Route::middleware(['auth:sanctum', 'admin'])->group(function () {
     Route::post('/shop-by-styles/batch', [AdminController::class, 'batchStyle']);
 });
 Route::middleware(['auth:sanctum', 'super'])->group(function () {
-    Route::put('/admin/users/{user}/role',[AdminController::class, 'role']);
-    Route::post('/admin/create-admin',[AdminController::class, 'createAdmin']);
-    Route::post('/admin/reset-password',[AdminController::class, 'resetPassword']);
+    Route::put('/admin/users/{user}/role', [AdminController::class, 'role']);
+    Route::post('/admin/create-admin', [AdminController::class, 'createAdmin']);
+    Route::post('/admin/reset-password', [AdminController::class, 'resetPassword']);
 });

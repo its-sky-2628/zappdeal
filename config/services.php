@@ -9,6 +9,7 @@ return [
         'entity_id' => env('VAS_SMS_ENTITY_ID'),
         'template_id' => env('VAS_SMS_TEMPLATE_ID'),
         'template' => env('VAS_SMS_MESSAGE_TEMPLATE', 'Your ZappDeal OTP is %s'),
+        'ca_bundle' => env('SMS_CA_BUNDLE'),
     ],
 
     'cashfree' => [

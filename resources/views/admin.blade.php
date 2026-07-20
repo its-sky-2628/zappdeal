@@ -3,10 +3,10 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>MiniBay Admin Dashboard</title>
+    <title>ZappDeal Admin Dashboard</title>
     <!-- Favicon -->
-    <link rel="icon" type="image/png" href="/assets/favicon.png?v=<?= filemtime(public_path('assets/favicon.png')) ?>">
-    <link rel="apple-touch-icon" href="/assets/favicon.png?v=<?= filemtime(public_path('assets/favicon.png')) ?>">
+    <link rel="icon" type="image/x-icon" href="/assets/favicons/favicon.ico?v=<?= filemtime(public_path('assets/favicons/favicon.ico')) ?>">
+    <link rel="apple-touch-icon" href="/assets/favicons/favicon.ico?v=<?= filemtime(public_path('assets/favicons/favicon.ico')) ?>">
 
     <link rel="stylesheet" href="/styles.css?v=<?= filemtime(public_path('styles.css')) ?>">
     <link rel="stylesheet" href="/admin.css?v=<?= filemtime(public_path('admin.css')) ?>">
@@ -18,8 +18,8 @@
           <div style="width: 60px; height: 60px; background: linear-gradient(135deg, #10f3ed, #0074d5); border-radius: 12px; display: inline-flex; align-items: center; justify-content: center; margin-bottom: 15px; box-shadow: 0 0 20px rgba(16, 243, 237, 0.35);">
             <svg viewBox="0 0 24 24" style="width: 32px; height: 32px; fill: black;"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z"/></svg>
           </div>
-          <h2 style="font-size: 24px; font-weight: 700; background: linear-gradient(to right, #ffffff, #8892b0); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">Admin Portal</h2>
-          <p style="color: var(--muted); font-size: 14px; margin-top: 5px;">Sign in to manage your store</p>
+          <h2 style="font-size: 24px; font-weight: 700; background: linear-gradient(to right, #ffffff, #8892b0); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">ZappDeal Admin</h2>
+          <p style="color: var(--muted); font-size: 14px; margin-top: 5px;">Sign in to manage ZappDeal</p>
         </div>
         <form id="admin-login-form" onsubmit="event.preventDefault(); handleLogin();">
           <div style="margin-bottom: 20px;">
@@ -62,6 +62,7 @@
           <button class="side-link" data-panel="banner"><span data-icon="image"></span>Banner</button>
           <button class="side-link" data-panel="trigger-mail"><span data-icon="send"></span>Trigger Mail</button>
           <button class="side-link" id="email-template-nav" data-panel="email-template" style="display:none;"><span data-icon="mail"></span>Email Template</button>
+          <button class="side-link" data-panel="bulk-orders" id="bulk-orders-nav" style="display:none;"><span data-icon="box"></span>Bulk Orders</button>
           <button class="side-link" data-panel="settings"><span data-icon="settings"></span>Settings</button>
           <button class="side-link logout-btn" onclick="adminLogout()"><span data-icon="close"></span>Logout</button>
         </nav>
@@ -1023,6 +1024,76 @@
               <div id="reviews-container-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 20px; padding: 20px 0;">
                 <!-- Review cards will be dynamically rendered here by admin.js -->
               </div>
+          </div>
+
+          <!-- Bulk Orders View -->
+          <div id="panel-bulk-orders" class="admin-view">
+            <div class="panel-subbar" style="display:flex; justify-content:space-between; align-items:center; margin: 20px 20px 0; border-bottom: none;">
+              <div>
+                <h2 style="font-size: 22px; font-weight: 700; color: white; margin: 0;">Bulk Order Requests</h2>
+                <p style="color: var(--muted); font-size: 13px; margin: 4px 0 0 0;">Manage bulk / wholesale purchase requests submitted by customers.</p>
+              </div>
+            </div>
+
+            <section class="metric-grid" aria-label="Bulk Orders metrics" style="margin: 20px 20px 0;">
+              <article class="metric-card purple">
+                <span class="metric-icon" data-icon="users"></span>
+                <small>Total Requests</small>
+                <strong id="bulk-orders-total">0</strong>
+                <span>All time</span>
+              </article>
+              <article class="metric-card green">
+                <span class="metric-icon" data-icon="check"></span>
+                <small>Contacted</small>
+                <strong id="bulk-orders-contacted">0</strong>
+                <span>Followed up</span>
+              </article>
+              <article class="metric-card orange">
+                <span class="metric-icon" data-icon="pending"></span>
+                <small>Pending</small>
+                <strong id="bulk-orders-pending">0</strong>
+                <span>New inquiries</span>
+              </article>
+            </section>
+
+            <section class="panel users-panel" style="margin: 20px;">
+              <header class="users-head">
+                <div>
+                  <h2>All Bulk Order Requests</h2>
+                  <span id="bulk-orders-panel-count">Manage customer inquiries</span>
+                </div>
+                <div style="display:flex; gap:10px; align-items:center; flex-wrap: wrap;">
+                  <label class="admin-search">
+                    <span data-icon="search"></span>
+                    <input type="search" placeholder="Search name, email, phone..." id="bulk-orders-panel-search">
+                  </label>
+                </div>
+              </header>
+              <div class="table-wrap">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Name</th>
+                      <th>Email</th>
+                      <th>Phone</th>
+                      <th>Company</th>
+                      <th>Quantity</th>
+                      <th>Message</th>
+                      <th>Date</th>
+                      <th>Status</th>
+                      <th>Action</th>
+                    </tr>
+                  </thead>
+                  <tbody id="bulk-orders-panel-table">
+                    <tr>
+                      <td colspan="9" style="text-align: center; color: var(--muted); padding: 40px; font-style: italic;">
+                        No bulk order requests yet. Customers will reach out via the Bulk Orders page.
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </section>
           </div>
 
           <!-- Settings View -->

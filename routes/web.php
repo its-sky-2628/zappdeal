@@ -19,4 +19,4 @@ Route::get('/sitemap.xml', function () {
 
     return response($xml, 200, ['Content-Type' => 'application/xml']);
 });
-Route::get('/{path?}', [WebController::class, 'storefront'])->where('path','.*');
+Route::get('/{path?}', [WebController::class, 'storefront'])->where('path', '.*');

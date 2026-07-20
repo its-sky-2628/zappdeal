@@ -1,0 +1,17 @@
+{
+  "info": { "name": "ZappDeal Mobile API v1", "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json" },
+  "variable": [{ "key": "baseUrl", "value": "http://localhost:8000/api/mobile/v1" }, { "key": "token", "value": "" }],
+  "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}", "type": "string" }] },
+  "item": [
+    { "name": "Startup", "request": { "auth": { "type": "noauth" }, "method": "GET", "url": "{{baseUrl}}/startup" } },
+    { "name": "Home", "request": { "auth": { "type": "noauth" }, "method": "GET", "url": "{{baseUrl}}/home" } },
+    { "name": "Products", "request": { "auth": { "type": "noauth" }, "method": "GET", "url": "{{baseUrl}}/products?page=1&sort=newest" } },
+    { "name": "Session", "request": { "method": "GET", "url": "{{baseUrl}}/session" } },
+    { "name": "Cart", "request": { "method": "GET", "url": "{{baseUrl}}/cart" } },
+    { "name": "Checkout preview", "request": { "method": "POST", "header": [{ "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{\"use_wallet\":false}" }, "url": "{{baseUrl}}/checkout/preview" } },
+    { "name": "Orders", "request": { "method": "GET", "url": "{{baseUrl}}/orders" } },
+    { "name": "Wallet", "request": { "method": "GET", "url": "{{baseUrl}}/wallet" } },
+    { "name": "Referrals", "request": { "method": "GET", "url": "{{baseUrl}}/referrals" } },
+    { "name": "Register device", "request": { "method": "POST", "header": [{ "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{\"token\":\"native-fcm-token\",\"platform\":\"android\",\"app_version\":\"1.0.0\"}" }, "url": "{{baseUrl}}/devices" } }
+  ]
+}

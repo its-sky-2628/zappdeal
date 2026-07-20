@@ -6,8 +6,10 @@
     <title>Customer Reviews - <?= $productName ?> | ZappDeal</title>
     
     <!-- Favicon -->
-    <link rel="icon" type="image/png" href="/assets/favicon.png?v=<?= filemtime(public_path('assets/favicon.png')) ?>">
-    <link rel="apple-touch-icon" href="/assets/favicon.png?v=<?= filemtime(public_path('assets/favicon.png')) ?>">
+    <link rel="icon" type="image/x-icon" href="/assets/favicons/favicon.ico?v=<?= filemtime(public_path('assets/favicons/favicon.ico')) ?>">
+    <link rel="icon" type="image/png" sizes="32x32" href="/assets/favicons/favicon-32x32-whitebg.png?v=<?= filemtime(public_path('assets/favicons/favicon-32x32-whitebg.png')) ?>">
+    <link rel="icon" type="image/png" sizes="16x16" href="/assets/favicons/favicon-16x16-whitebg.png?v=<?= filemtime(public_path('assets/favicons/favicon-16x16-whitebg.png')) ?>">
+    <link rel="apple-touch-icon" sizes="180x180" href="/assets/favicons/apple-touch-icon.png?v=<?= filemtime(public_path('assets/favicons/apple-touch-icon.png')) ?>">
     
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">

@@ -1,0 +1,14 @@
+{
+  "info": {"name": "ZappDeal Mobile API v1", "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"},
+  "variable": [{"key": "base_url", "value": "http://127.0.0.1:8000/api/mobile/v1"}, {"key": "token", "value": ""}, {"key": "product_id", "value": "1"}, {"key": "address_id", "value": "1"}],
+  "auth": {"type": "bearer", "bearer": [{"key": "token", "value": "{{token}}", "type": "string"}]},
+  "item": [
+    {"name": "Home", "request": {"auth": {"type": "noauth"}, "method": "GET", "url": "{{base_url}}/home"}},
+    {"name": "Products", "request": {"auth": {"type": "noauth"}, "method": "GET", "url": "{{base_url}}/products?q=case&sort=newest"}},
+    {"name": "Session", "request": {"method": "GET", "url": "{{base_url}}/session"}},
+    {"name": "Merge cart", "request": {"method": "POST", "header": [{"key": "Content-Type", "value": "application/json"}], "body": {"mode": "raw", "raw": "{\"items\":[{\"product_id\":{{product_id}},\"quantity\":1}]}"}, "url": "{{base_url}}/cart/merge"}},
+    {"name": "Checkout preview", "request": {"method": "POST", "header": [{"key": "Content-Type", "value": "application/json"}], "body": {"mode": "raw", "raw": "{\"use_wallet\":false}"}, "url": "{{base_url}}/checkout/preview"}},
+    {"name": "Place COD order", "request": {"method": "POST", "header": [{"key": "Content-Type", "value": "application/json"}, {"key": "Idempotency-Key", "value": "postman-order-{{$timestamp}}"}], "body": {"mode": "raw", "raw": "{\"address_id\":{{address_id}},\"payment_method\":\"COD\"}"}, "url": "{{base_url}}/checkout/place"}},
+    {"name": "Orders", "request": {"method": "GET", "url": "{{base_url}}/orders"}}
+  ]
+}

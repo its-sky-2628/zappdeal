@@ -29,8 +29,8 @@
     <link rel="canonical" href="<?= htmlspecialchars($currentUrl) ?>">
 
     <!-- Favicon -->
-    <link rel="icon" type="image/png" href="/assets/favicon.png?v=<?= filemtime(public_path('assets/favicon.png')) ?>">
-    <link rel="apple-touch-icon" href="/assets/favicon.png?v=<?= filemtime(public_path('assets/favicon.png')) ?>">
+    <link rel="icon" type="image/x-icon" href="/assets/favicons/favicon.ico?v=<?= filemtime(public_path('assets/favicons/favicon.ico')) ?>">
+    <link rel="apple-touch-icon" href="/assets/favicons/favicon.ico?v=<?= filemtime(public_path('assets/favicons/favicon.ico')) ?>">
 
     <!-- Open Graph / Facebook -->
     <meta property="og:type" content="<?= $is_product_page ? 'product' : 'website' ?>">
@@ -288,6 +288,7 @@
           <nav class="footer-links" aria-label="Help and Support">
             <h2>Help & Support</h2>
             <a href="/support" data-nav="support">Help Center</a>
+            <a href="/bulk-orders" data-nav="bulk-orders">Bulk Orders</a>
             <a href="/policies/contact" data-policy="contact">Contact Us</a>
             <a href="/policies/terms" data-policy="terms">Terms & Conditions</a>
             <a href="/policies/privacy" data-policy="privacy">Privacy Policy</a>

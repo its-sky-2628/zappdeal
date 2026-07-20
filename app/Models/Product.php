@@ -11,7 +11,7 @@ class Product extends Model
 
     protected function casts(): array
     {
-        return ['price' => 'integer', 'old_price' => 'integer', 'rating' => 'float', 'reviews' => 'integer', 'images' => 'array', 'colors' => 'array', 'models' => 'array', 'is_newly_launched' => 'boolean', 'is_recommended' => 'boolean', 'is_style' => 'boolean'];
+        return ['price' => 'integer', 'old_price' => 'integer', 'rating' => 'float', 'reviews' => 'integer', 'images' => 'array', 'colors' => 'array', 'models' => 'array', 'is_newly_launched' => 'boolean', 'is_recommended' => 'boolean', 'is_style' => 'boolean', 'inventory_tracked' => 'boolean', 'stock_quantity' => 'integer', 'is_available' => 'boolean'];
     }
 
     public function orders(): HasMany

@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
@@ -26,6 +27,7 @@ class User extends Authenticatable
             'is_admin' => 'boolean',
             'is_super' => 'boolean',
             'wallet_balance' => 'integer',
+            'anonymized_at' => 'datetime',
         ];
     }
 
@@ -57,5 +59,20 @@ class User extends Authenticatable
     public function referrals(): HasMany
     {
         return $this->hasMany(Referral::class, 'user_id');
+    }
+
+    public function cart(): HasOne
+    {
+        return $this->hasOne(Cart::class);
+    }
+
+    public function wishlistItems(): HasMany
+    {
+        return $this->hasMany(WishlistItem::class);
+    }
+
+    public function deviceRegistrations(): HasMany
+    {
+        return $this->hasMany(DeviceRegistration::class);
     }
 }

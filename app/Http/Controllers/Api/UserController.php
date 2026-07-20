@@ -52,7 +52,7 @@ class UserController extends Controller
                 $request->user()->addresses()->update(['is_default' => false]);
             }
 
-return $request->user()->addresses()->create($data);
+            return $request->user()->addresses()->create($data);
         });
 
         return response()->json($address, 201);
@@ -80,7 +80,7 @@ return $request->user()->addresses()->create($data);
             $request->user()->addresses()->latest('id')->first()?->update(['is_default' => true]);
         }
 
-return response()->json(['message' => 'Address deleted successfully']);
+        return response()->json(['message' => 'Address deleted successfully']);
     }
 
     public function defaultAddress(Request $request, UserAddress $address): JsonResponse
