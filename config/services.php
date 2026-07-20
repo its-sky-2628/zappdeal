@@ -2,6 +2,22 @@
 
 return [
 
+    'sms' => [
+        'driver' => env('SMS_DRIVER', 'log'),
+        'api_key' => env('VAS_SMS_API_KEY'),
+        'sender' => env('VAS_SMS_SENDER', 'ZPDEAL'),
+        'entity_id' => env('VAS_SMS_ENTITY_ID'),
+        'template_id' => env('VAS_SMS_TEMPLATE_ID'),
+        'template' => env('VAS_SMS_MESSAGE_TEMPLATE', 'Your ZappDeal OTP is %s'),
+    ],
+
+    'cashfree' => [
+        'app_id' => env('CASHFREE_APP_ID'),
+        'secret' => env('CASHFREE_SECRET_KEY'),
+        'mode' => env('CASHFREE_MODE', 'sandbox'),
+        'base_url' => env('CASHFREE_MODE', 'sandbox') === 'production' ? 'https://api.cashfree.com' : 'https://sandbox.cashfree.com',
+    ],
+
     /*
     |--------------------------------------------------------------------------
     | Third Party Services
