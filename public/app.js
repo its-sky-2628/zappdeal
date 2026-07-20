@@ -490,7 +490,6 @@ async function loadProductsFromApi() {
             
             if (window.__iselectricsStateReady && state.view === "home") renderHome();
             if (window.__iselectricsStateReady && state.view === "categories") renderCategories();
-            if (window.__iselectricsStateReady && ["cart", "checkout"].includes(state.view)) renderAll();
         }
     } catch (e) {
         console.error("Failed to load products from API", e);
@@ -7149,7 +7148,9 @@ window.continueToPayment = function() {
 function renderCheckout() {
   const items = cartItems();
   if (items.length === 0) {
-    setView("cart");
+    if (state.view === "checkout") {
+      setView("home");
+    }
     return;
   }
 
