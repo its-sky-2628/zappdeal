@@ -7626,7 +7626,7 @@ function canonicalUrlForView(view) {
   return appPath(routes[view] || "/");
 }
 
-function setView(view, fromHashChange = false) {
+function setView(view, fromHashChange = false, skipScroll = false) {
   if (view === "home" || view === "product") {
     clearSearchInputs();
   }
@@ -7875,10 +7875,11 @@ function setView(view, fromHashChange = false) {
       window.searchSuggestionsManager.hide();
     }
   }
-  // Only scroll to top on user-initiated navigation, not on polling/API re-renders
-  if (!fromHashChange && previousView !== view) {
-    window.scrollTo({ top: 0, behavior: "instant" });
-  }
+  
+  // FIX: Auto-scroll line completely commented out to stop page jumping completely
+  // if (!fromHashChange && previousView !== view && !skipScroll) {
+  //   window.scrollTo({ top: 0, behavior: "instant" });
+  // }
 }
 
 function backTarget() {
