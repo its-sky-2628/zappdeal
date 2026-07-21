@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>ZappDeal Admin Dashboard</title>
+    <title>ZappDeal</title>
     <!-- Favicon -->
     <link rel="icon" type="image/x-icon" href="/assets/favicons/favicon.ico?v=<?= filemtime(public_path('assets/favicons/favicon.ico')) ?>">
     <link rel="apple-touch-icon" href="/assets/favicons/favicon.ico?v=<?= filemtime(public_path('assets/favicons/favicon.ico')) ?>">
@@ -62,8 +62,8 @@
           <button class="side-link" data-panel="banner"><span data-icon="image"></span>Banner</button>
           <button class="side-link" data-panel="trigger-mail"><span data-icon="send"></span>Trigger Mail</button>
           <button class="side-link" id="email-template-nav" data-panel="email-template" style="display:none;"><span data-icon="mail"></span>Email Template</button>
-          <button class="side-link" data-panel="bulk-orders" id="bulk-orders-nav" style="display:none;"><span data-icon="box"></span>Bulk Orders</button>
           <button class="side-link" data-panel="settings"><span data-icon="settings"></span>Settings</button>
+          <button class="side-link" data-panel="bulk-orders" id="bulk-orders-nav" style="display:none;"><span data-icon="box"></span>Bulk Orders</button>
           <button class="side-link logout-btn" onclick="adminLogout()"><span data-icon="close"></span>Logout</button>
         </nav>
       </aside>
