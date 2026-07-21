@@ -18,7 +18,7 @@
           <div style="width: 60px; height: 60px; background: linear-gradient(135deg, #10f3ed, #0074d5); border-radius: 12px; display: inline-flex; align-items: center; justify-content: center; margin-bottom: 15px; box-shadow: 0 0 20px rgba(16, 243, 237, 0.35);">
             <svg viewBox="0 0 24 24" style="width: 32px; height: 32px; fill: black;"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z"/></svg>
           </div>
-          <h2 style="font-size: 24px; font-weight: 700; background: linear-gradient(to right, #ffffff, #8892b0); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">ZappDeal Admin</h2>
+          <h2 style="font-size: 24px; font-weight: 700; background: linear-gradient(to right, #ffffff, #8892b0); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">ZappDeal Admin TEST</h2>
           <p style="color: var(--muted); font-size: 14px; margin-top: 5px;">Sign in to manage ZappDeal</p>
         </div>
         <form id="admin-login-form" onsubmit="event.preventDefault(); handleLogin();">
