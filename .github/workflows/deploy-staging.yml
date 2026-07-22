@@ -46,6 +46,8 @@ jobs:
             ./ "${{ secrets.STAGING_SSH_USER }}@${{ secrets.STAGING_SSH_HOST }}:${{ secrets.STAGING_REMOTE_PATH }}/"
 
       - name: Run remote deploy steps
+        # SSH's default `php` on this host resolves to CloudLinux's cl.selector (currently 8.1),
+        # not the 8.4 the app requires -- must use the versioned binary explicitly.
         run: |
           ssh -p "${{ secrets.STAGING_SSH_PORT }}" -i ~/.ssh/id_ed25519 -o StrictHostKeyChecking=yes \
             "${{ secrets.STAGING_SSH_USER }}@${{ secrets.STAGING_SSH_HOST }}" \
