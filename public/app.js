@@ -6843,6 +6843,207 @@ function getPolicyContent(tab) {
           <p>Approved cases may receive a replacement product, or store credit if a replacement is unavailable. No cash refunds unless legally required.</p>
         </section>
       `;
+    case "bulk-orders":
+  return `
+    <style>
+      .bulk-wrapper {
+        max-width: 680px;
+        margin: 0 auto;
+        padding: 32px;
+        /* Background dashboard ke dark color se matching */
+        background: rgba(22, 22, 34, 0.75);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-radius: 20px;
+        backdrop-filter: blur(12px);
+        box-shadow: 0 20px 50px rgba(0, 0, 0, 0.4);
+        font-family: 'Inter', system-ui, -apple-system, sans-serif;
+        color: #ffffff;
+        animation: fadeIn 0.3s ease-out;
+      }
+
+      .bulk-header {
+        text-align: center;
+        margin-bottom: 28px;
+      }
+
+      .bulk-header h1 {
+        font-size: 26px;
+        color: #ffffff;
+        margin: 0 0 8px 0;
+        font-weight: 700;
+        letter-spacing: -0.5px;
+      }
+
+      .bulk-header p {
+        color: #94a3b8;
+        font-size: 14px;
+        margin: 0;
+      }
+
+      .form-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 18px;
+      }
+
+      .full-width {
+        grid-column: span 2;
+      }
+
+      .input-group {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+      }
+
+      .input-group label {
+        font-size: 13px;
+        font-weight: 500;
+        color: #cbd5e1;
+      }
+
+      .input-group input,
+      .input-group textarea {
+        width: 100%;
+        padding: 12px 16px;
+        /* Dark inputs for seamless integration */
+        background: rgba(15, 15, 26, 0.6);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 12px;
+        font-size: 14px;
+        color: #f8fafc;
+        outline: none;
+        box-sizing: border-box;
+        transition: all 0.25s ease;
+      }
+
+      .input-group input::placeholder,
+      .input-group textarea::placeholder {
+        color: #64748b;
+      }
+
+      .input-group textarea {
+        resize: vertical;
+        min-height: 85px;
+      }
+
+      /* Hover & Active Focus Glow matching your active button color */
+      .input-group input:hover,
+      .input-group textarea:hover {
+        border-color: rgba(99, 102, 241, 0.4);
+      }
+
+      .input-group input:focus,
+      .input-group textarea:focus {
+        border-color: #6366f1;
+        background: rgba(15, 15, 26, 0.9);
+        box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.25);
+      }
+
+      /* Submit Button matched with left-sidebar active state color */
+      .submit-btn {
+        width: 100%;
+        padding: 14px;
+        margin-top: 8px;
+        background: #5b46f6;
+        color: #ffffff;
+        border: none;
+        border-radius: 12px;
+        font-size: 15px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.25s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        box-shadow: 0 4px 20px rgba(91, 70, 246, 0.35);
+      }
+
+      .submit-btn:hover {
+        background: #4f39f4;
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(91, 70, 246, 0.5);
+      }
+
+      .submit-btn:active {
+        transform: translateY(0);
+      }
+
+      /* Responsive */
+      @media (max-width: 600px) {
+        .form-grid {
+          grid-template-columns: 1fr;
+        }
+        .full-width {
+          grid-column: span 1;
+        }
+        .bulk-wrapper {
+          padding: 20px;
+        }
+      }
+
+      @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(8px); }
+        to { opacity: 1; transform: translateY(0); }
+      }
+    </style>
+
+    <div class="bulk-wrapper">
+      <div class="bulk-header">
+        <h1>Bulk Orders</h1>
+        <p>Place your bulk order enquiry below and we'll get back to you.</p>
+      </div>
+
+      <form class="form-grid" onsubmit="event.preventDefault();">
+        <div class="input-group">
+          <label>Full Name</label>
+          <input type="text" placeholder="e.g. Rahul Sharma" required>
+        </div>
+
+        <div class="input-group">
+          <label>Mobile Number</label>
+          <input type="tel" placeholder="+91 9876543210" required>
+        </div>
+
+        <div class="input-group">
+          <label>Email Address</label>
+          <input type="email" placeholder="rahul@example.com" required>
+        </div>
+
+        <div class="input-group">
+          <label>Company Name (Optional)</label>
+          <input type="text" placeholder="Company Ltd.">
+        </div>
+
+        <div class="input-group">
+          <label>Product Name</label>
+          <input type="text" placeholder="Item name" required>
+        </div>
+
+        <div class="input-group">
+          <label>Quantity Required</label>
+          <input type="number" min="1" placeholder="e.g. 50" required>
+        </div>
+
+        <div class="input-group full-width">
+          <label>Delivery Address</label>
+          <textarea placeholder="Enter complete delivery address"></textarea>
+        </div>
+
+        <div class="input-group full-width">
+          <label>Additional Requirements (Optional)</label>
+          <textarea placeholder="Any specific requirements..."></textarea>
+        </div>
+
+        <div class="full-width">
+          <button type="submit" class="submit-btn">
+            Submit Enquiry
+          </button>
+        </div>
+      </form>
+    </div>
+  `;    
     case "cancellation":
       return `
         <h1>Cancellation Policy</h1>
@@ -6989,6 +7190,7 @@ function renderPolicy() {
     { id: "refund", name: "Refund Policy", icon: "wallet" },
     { id: "payment", name: "Payment Policy", icon: "credit-card" },
     { id: "contact", name: "Contact Us", icon: "mail" },
+    { id: "bulk-orders", name: "Bulk Orders", icon: "box" },
     { id: "faq", name: "FAQs", icon: "help" }
   ];
 

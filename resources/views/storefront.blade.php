@@ -288,11 +288,11 @@
           <nav class="footer-links" aria-label="Help and Support">
             <h2>Help & Support</h2>
             <a href="/support" data-nav="support">Help Center</a>
-            <a href="/bulk-orders" data-nav="bulk-orders">Bulk Orders</a>
             <a href="/policies/contact" data-policy="contact">Contact Us</a>
             <a href="/policies/terms" data-policy="terms">Terms & Conditions</a>
             <a href="/policies/privacy" data-policy="privacy">Privacy Policy</a>
             <a href="/support" data-nav="support">About Us</a>
+            <a href="/policies/bulk-orders" data-policy="bulk-orders">Bulk Orders</a>
           </nav>
 
           <div class="footer-contact">
