@@ -29,7 +29,7 @@
     <link rel="canonical" href="<?= htmlspecialchars($currentUrl) ?>">
 
     <!-- Favicon -->
-    <link rel="icon" type="image/x-icon" href="/assets/favicons/favicon.ico?v=<?= filemtime(public_path('assets/favicons/favicon.ico')) ?>">
+    <link rel="icon" type="image/png" href="/assets/favicons/Icon.png?v=<?= filemtime(public_path('assets/favicons/Icon.png')) ?>">
     <link rel="apple-touch-icon" href="/assets/favicons/favicon.ico?v=<?= filemtime(public_path('assets/favicons/favicon.ico')) ?>">
 
     <!-- Open Graph / Facebook -->

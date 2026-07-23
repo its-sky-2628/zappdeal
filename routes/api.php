@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Api\AdminController;
 use App\Http\Controllers\Api\AuthController;
+use App\Http\Controllers\Api\BulkOrderController;
 use App\Http\Controllers\Api\CatalogController;
 use App\Http\Controllers\Api\FinanceController;
 use App\Http\Controllers\Api\OrderController;
@@ -25,6 +26,7 @@ Route::get('/settings', [CatalogController::class, 'settings']);
 Route::get('/reviews', [ReviewController::class, 'index']);
 Route::get('/products/{product}/reviews', [ReviewController::class, 'product']);
 Route::post('/products/{product}/reviews', [ReviewController::class, 'store']);
+Route::post('/bulk-order', [BulkOrderController::class, 'store']);
 Route::post('/reviews/{review}/like', [ReviewController::class, 'like']);
 Route::patch('/reviews/{review}', [ReviewController::class, 'like']);
 Route::get('/coupons/validate', function (Request $request) {

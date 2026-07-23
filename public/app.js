@@ -661,6 +661,56 @@ async function loadUserReferralsFromApi() {
         console.error("Failed to load referrals from API", e);
     }
 }
+// Form submission handles karne ke liye
+document.addEventListener("submit", async function (e) {
+
+  if (!e.target || e.target.id !== "bulk-order-form") return;
+
+  e.preventDefault();
+
+  const form = e.target;
+
+  const formData = {
+    full_name: form.querySelector('[name="full_name"]').value.trim(),
+    mobile: form.querySelector('[name="mobile"]').value.trim(),
+    email: form.querySelector('[name="email"]').value.trim(),
+    company_name: form.querySelector('[name="company_name"]').value.trim(),
+    delivery_address: form.querySelector('[name="delivery_address"]').value.trim(),
+    product_name: form.querySelector('[name="product_name"]').value.trim(),
+    quantity: form.querySelector('[name="quantity"]').value,
+    requirements: form.querySelector('[name="requirements"]').value.trim()
+  };
+
+  try {
+
+    const response = await fetch("/api/bulk-order", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Accept": "application/json"
+      },
+      body: JSON.stringify(formData)
+    });
+
+    const result = await response.json();
+
+    if (!response.ok) {
+      throw new Error(result.message || "Failed to submit enquiry.");
+    }
+
+    alert("Bulk Order Submitted Successfully!");
+
+    form.reset();
+
+  } catch (error) {
+
+    console.error(error);
+
+    alert(error.message);
+
+  }
+
+});
 loadUserReferralsFromApi();
 
 const transactions = [];
@@ -6846,32 +6896,30 @@ function getPolicyContent(tab) {
     case "bulk-orders":
   return `
     <style>
-      .bulk-wrapper {
-        max-width: 680px;
+      /* Layout & Page Container */
+      .bulk-page {
+        width: 100%;
+        max-width: 1050px;
         margin: 0 auto;
-        padding: 32px;
-        /* Background dashboard ke dark color se matching */
-        background: rgba(22, 22, 34, 0.75);
-        border: 1px solid rgba(255, 255, 255, 0.08);
-        border-radius: 20px;
-        backdrop-filter: blur(12px);
-        box-shadow: 0 20px 50px rgba(0, 0, 0, 0.4);
-        font-family: 'Inter', system-ui, -apple-system, sans-serif;
-        color: #ffffff;
-        animation: fadeIn 0.3s ease-out;
+        color: #f1f5f9;
+        font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        position: relative;
+        z-index: 1;
       }
 
       .bulk-header {
-        text-align: center;
-        margin-bottom: 28px;
+        margin-bottom: 24px;
       }
 
       .bulk-header h1 {
-        font-size: 26px;
-        color: #ffffff;
-        margin: 0 0 8px 0;
+        font-size: 28px;
         font-weight: 700;
-        letter-spacing: -0.5px;
+        color: #ffffff;
+        margin: 0 0 6px 0;
+      }
+
+      .bulk-header h1 span {
+        color: #a855f7; /* Colored Accent */
       }
 
       .bulk-header p {
@@ -6880,170 +6928,472 @@ function getPolicyContent(tab) {
         margin: 0;
       }
 
-      .form-grid {
+      /* Wrapper for 2 Column Side-by-Side Layout */
+      .bulk-wrapper {
         display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 18px;
+        grid-template-columns: 1.6fr 1fr;
+        gap: 20px;
+        align-items: start;
       }
 
-      .full-width {
-        grid-column: span 2;
+      /* Card Common Style */
+      .bulk-card {
+        background: #12121a;
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-radius: 16px;
+        padding: 24px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
       }
 
-      .input-group {
+      .bulk-card-head {
+        display: flex;
+        gap: 14px;
+        align-items: flex-start;
+        margin-bottom: 20px;
+      }
+
+      .bulk-card-head h3 {
+        margin: 0 0 4px 0;
+        font-size: 16px;
+        font-weight: 600;
+        color: #ffffff;
+      }
+
+      .bulk-card-head p {
+        margin: 0;
+        font-size: 13px;
+        color: #94a3b8;
+      }
+
+      /* Icon Styling */
+      .round-icon, .bulk-contact-icon {
+        width: 40px;
+        height: 40px;
+        background: rgba(168, 85, 247, 0.15);
+        border: 1px solid rgba(168, 85, 247, 0.3);
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #c084fc;
+        flex-shrink: 0;
+      }
+
+      /* Form Elements Setup */
+      #bulk-order-form {
         display: flex;
         flex-direction: column;
-        gap: 6px;
+        gap: 14px;
       }
 
-      .input-group label {
+      #bulk-order-form label {
         font-size: 13px;
         font-weight: 500;
         color: #cbd5e1;
+        display: block;
+        margin-bottom: 6px;
       }
 
-      .input-group input,
-      .input-group textarea {
+      #bulk-order-form label span {
+        color: #ef4444;
+      }
+
+      #bulk-order-form input, 
+      #bulk-order-form textarea {
         width: 100%;
-        padding: 12px 16px;
-        /* Dark inputs for seamless integration */
-        background: rgba(15, 15, 26, 0.6);
-        border: 1px solid rgba(255, 255, 255, 0.1);
-        border-radius: 12px;
-        font-size: 14px;
-        color: #f8fafc;
+        background: #0a0a10;
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        border-radius: 8px;
+        padding: 10px 14px;
+        color: #ffffff;
+        font-size: 13px;
         outline: none;
         box-sizing: border-box;
-        transition: all 0.25s ease;
+        transition: all 0.2s;
       }
 
-      .input-group input::placeholder,
-      .input-group textarea::placeholder {
-        color: #64748b;
+      #bulk-order-form input:focus, 
+      #bulk-order-form textarea:focus {
+        border-color: #a855f7;
+        box-shadow: 0 0 0 3px rgba(168, 85, 247, 0.2);
       }
 
-      .input-group textarea {
+      #bulk-order-form textarea {
         resize: vertical;
-        min-height: 85px;
+        min-height: 70px;
       }
 
-      /* Hover & Active Focus Glow matching your active button color */
-      .input-group input:hover,
-      .input-group textarea:hover {
-        border-color: rgba(99, 102, 241, 0.4);
+      /* Grid for Bottom Form Inputs */
+      .bulk-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 14px;
       }
 
-      .input-group input:focus,
-      .input-group textarea:focus {
-        border-color: #6366f1;
-        background: rgba(15, 15, 26, 0.9);
-        box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.25);
-      }
-
-      /* Submit Button matched with left-sidebar active state color */
-      .submit-btn {
+      /* Clickable Primary Submit Button Fix */
+      .primary-btn.full {
         width: 100%;
-        padding: 14px;
-        margin-top: 8px;
-        background: #5b46f6;
-        color: #ffffff;
+        background: linear-gradient(135deg, #8b5cf6, #a855f7);
+        color: white;
         border: none;
-        border-radius: 12px;
-        font-size: 15px;
+        padding: 12px;
+        border-radius: 10px;
         font-weight: 600;
-        cursor: pointer;
-        transition: all 0.25s ease;
+        font-size: 14px;
+        cursor: pointer !important;
         display: flex;
         align-items: center;
         justify-content: center;
         gap: 8px;
-        box-shadow: 0 4px 20px rgba(91, 70, 246, 0.35);
+        margin-top: 6px;
+        transition: all 0.2s ease;
+        position: relative;
+        z-index: 10;
+        pointer-events: auto !important;
       }
 
-      .submit-btn:hover {
-        background: #4f39f4;
-        transform: translateY(-2px);
-        box-shadow: 0 8px 25px rgba(91, 70, 246, 0.5);
+      .primary-btn.full:hover {
+        opacity: 0.95;
+        transform: translateY(-1px);
+        box-shadow: 0 4px 15px rgba(168, 85, 247, 0.4);
       }
 
-      .submit-btn:active {
+      .primary-btn.full:active {
         transform: translateY(0);
       }
 
-      /* Responsive */
-      @media (max-width: 600px) {
-        .form-grid {
-          grid-template-columns: 1fr;
-        }
-        .full-width {
-          grid-column: span 1;
-        }
-        .bulk-wrapper {
-          padding: 20px;
-        }
+      .bulk-note {
+        font-size: 12px;
+        color: #64748b;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+        margin: 4px 0 0 0;
       }
 
-      @keyframes fadeIn {
-        from { opacity: 0; transform: translateY(8px); }
-        to { opacity: 1; transform: translateY(0); }
+      /* Right Side (Or Contact Us Direct) */
+      .bulk-right .bulk-card {
+        text-align: center;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+      }
+
+      .bulk-contact-icon {
+        margin-bottom: 12px;
+      }
+
+      .bulk-right h3 {
+        margin: 0 0 4px 0;
+        font-size: 16px;
+        color: #ffffff;
+      }
+
+      .bulk-right > p {
+        font-size: 12px;
+        color: #94a3b8;
+        margin: 0 0 12px 0;
+      }
+
+      .bulk-email {
+        display: block;
+        width: 100%;
+        padding: 10px;
+        background: rgba(168, 85, 247, 0.1);
+        border: 1px dashed rgba(168, 85, 247, 0.4);
+        border-radius: 8px;
+        color: #c084fc;
+        font-weight: 600;
+        font-size: 14px;
+        text-decoration: none;
+        box-sizing: border-box;
+      }
+
+      .bulk-divider {
+        margin: 16px 0;
+        width: 100%;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+        line-height: 0.1em;
+      }
+
+      .bulk-divider span {
+        background: #12121a;
+        padding: 0 10px;
+        color: #64748b;
+        font-size: 11px;
+      }
+
+      .bulk-feature {
+        display: flex;
+        align-items: flex-start;
+        text-align: left;
+        gap: 12px;
+        width: 100%;
+        margin-bottom: 14px;
+      }
+
+      .bulk-feature h4 {
+        margin: 0 0 2px 0;
+        font-size: 13px;
+        color: #f1f5f9;
+      }
+
+      .bulk-feature p {
+        margin: 0;
+        font-size: 12px;
+        color: #94a3b8;
+      }
+
+      .bulk-info {
+        background: rgba(255, 255, 255, 0.03);
+        border: 1px solid rgba(255, 255, 255, 0.06);
+        border-radius: 10px;
+        padding: 12px;
+        text-align: left;
+        display: flex;
+        gap: 10px;
+        width: 100%;
+        box-sizing: border-box;
+        margin-top: 6px;
+      }
+
+      .bulk-info strong {
+        display: block;
+        font-size: 12px;
+        color: #f1f5f9;
+      }
+
+      .bulk-info p {
+        margin: 2px 0 0 0;
+        font-size: 11px;
+        color: #94a3b8;
+      }
+
+      .bulk-footer-trust {
+        text-align: center;
+        margin-top: 20px;
+        font-size: 12px;
+        color: #64748b;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+      }
+
+      @media (max-width: 850px) {
+        .bulk-wrapper {
+          grid-template-columns: 1fr;
+        }
       }
     </style>
 
-    <div class="bulk-wrapper">
+    <div class="bulk-page">
+
       <div class="bulk-header">
-        <h1>Bulk Orders</h1>
-        <p>Place your bulk order enquiry below and we'll get back to you.</p>
+        <h1>Bulk <span>Orders</span></h1>
+        <p>Place large orders for your business, events or reselling needs.</p>
       </div>
 
-      <form class="form-grid" onsubmit="event.preventDefault();">
-        <div class="input-group">
-          <label>Full Name</label>
-          <input type="text" placeholder="e.g. Rahul Sharma" required>
-        </div>
+      <div class="bulk-wrapper">
 
-        <div class="input-group">
-          <label>Mobile Number</label>
-          <input type="tel" placeholder="+91 9876543210" required>
-        </div>
+        <div class="bulk-left">
 
-        <div class="input-group">
-          <label>Email Address</label>
-          <input type="email" placeholder="rahul@example.com" required>
-        </div>
+          <div class="bulk-card">
 
-        <div class="input-group">
-          <label>Company Name (Optional)</label>
-          <input type="text" placeholder="Company Ltd.">
-        </div>
+            <div class="bulk-card-head">
+              <span class="round-icon">${icon("box")}</span>
 
-        <div class="input-group">
-          <label>Product Name</label>
-          <input type="text" placeholder="Item name" required>
-        </div>
+              <div>
+                <h3>Request a Bulk Quote</h3>
+                <p>Fill out the form below and our team will get back to you with the best pricing.</p>
+              </div>
+            </div>
 
-        <div class="input-group">
-          <label>Quantity Required</label>
-          <input type="number" min="1" placeholder="e.g. 50" required>
-        </div>
+        <form id="bulk-order-form" class="bulk-order-form">
 
-        <div class="input-group full-width">
-          <label>Delivery Address</label>
-          <textarea placeholder="Enter complete delivery address"></textarea>
-        </div>
+  <div>
+    <label>Full Name <span>*</span></label>
+    <input
+      type="text"
+      name="full_name"
+      placeholder="Enter your full name"
+      required
+    >
+  </div>
 
-        <div class="input-group full-width">
-          <label>Additional Requirements (Optional)</label>
-          <textarea placeholder="Any specific requirements..."></textarea>
-        </div>
+  <div>
+    <label>Mobile Number <span>*</span></label>
+    <input
+      type="tel"
+      name="mobile"
+      maxlength="10"
+      inputmode="numeric"
+      pattern="[0-9]{10}"
+      placeholder="Enter your mobile number"
+      oninput="this.value=this.value.replace(/[^0-9]/g,'').slice(0,10)"
+      required
+    >
+  </div>
 
-        <div class="full-width">
-          <button type="submit" class="submit-btn">
-            Submit Enquiry
-          </button>
-        </div>
-      </form>
+  <div>
+    <label>Email Address <span>*</span></label>
+    <input
+      type="email"
+      name="email"
+      placeholder="Enter your email address"
+      required
+    >
+  </div>
+
+  <div>
+    <label>Company Name (Optional)</label>
+    <input
+      type="text"
+      name="company_name"
+      placeholder="Enter your company name"
+      oninput="this.value=this.value.replace(/[^a-zA-Z ]/g,'')"
+    >
+  </div>
+
+  <div class="bulk-grid">
+
+    <div>
+      <label>Delivery Address <span>*</span></label>
+      <textarea
+        name="delivery_address"
+        placeholder="Enter complete delivery address"
+        required
+      ></textarea>
     </div>
-  `;    
+
+    <div>
+      <label>Product Name <span>*</span></label>
+      <input
+        type="text"
+        name="product_name"
+        placeholder="Enter product name"
+        required
+      >
+    </div>
+
+    <div>
+      <label>Quantity Required <span>*</span></label>
+      <input
+        type="number"
+        name="quantity"
+        min="1"
+        placeholder="Enter quantity"
+        required
+      >
+    </div>
+
+    <div>
+      <label>Additional Requirements (Optional)</label>
+      <textarea
+        name="requirements"
+        placeholder="Any specific requirements?"
+      ></textarea>
+    </div>
+
+  </div>
+
+  <button class="primary-btn full" type="submit">
+    ${icon("send")}
+    Request Bulk Quote
+  </button>
+
+  <p class="bulk-note">
+    ${icon("shield")}
+    Your information is safe with us and will never be shared.
+  </p>
+</form>
+
+        </div>  
+      </div>   
+
+      <div class="bulk-right">
+
+          <div class="bulk-card">
+
+            <div class="bulk-contact-icon">
+              ${icon("mail")}
+            </div>
+
+            <h3>Or Contact Us Directly</h3>
+
+            <p>Email us for bulk order inquiries</p>
+
+            <a class="bulk-email" href="mailto:bulk@zappdeal.com">
+              bulk@zappdeal.com
+            </a>
+
+            <div class="bulk-divider">
+              <span>OR</span>
+            </div>
+
+            <div class="bulk-feature">
+
+              <span class="round-icon">
+                ${icon("headphones")}
+              </span>
+
+              <div>
+                <h4>We're here to help</h4>
+                <p>Our team is ready to assist you with your bulk order requirements.</p>
+              </div>
+
+            </div>
+
+            <div class="bulk-feature">
+
+              <span class="round-icon">
+                ${icon("award")}
+              </span>
+
+              <div>
+                <h4>Best Prices Guaranteed</h4>
+                <p>Get the most competitive bulk pricing on all products.</p>
+              </div>
+
+            </div>
+
+            <div class="bulk-feature">
+
+              <span class="round-icon">
+                ${icon("truck")}
+              </span>
+
+              <div>
+                <h4>Reliable & Timely Delivery</h4>
+                <p>We ensure timely delivery right to your doorstep.</p>
+              </div>
+
+            </div>
+
+            <div class="bulk-info">
+
+              ${icon("clock")}
+
+              <div>
+                <strong>Quick Response</strong>
+                <p>Our team will contact you within <strong>24 business hours</strong> with a customized quotation, availability and delivery timeline.</p>
+              </div>
+
+            </div>
+
+          </div>
+
+        </div>
+
+      </div>
+
+      <div class="bulk-footer-trust">
+        ${icon("shield")} Your trust is important to us. All bulk order requests are handled with complete confidentiality.
+      </div>
+
+    </div>
+  `;
     case "cancellation":
       return `
         <h1>Cancellation Policy</h1>
@@ -8243,22 +8593,41 @@ document.addEventListener("click", async (event) => {
   }
 
   if (target.dataset.nav) {
-    event.preventDefault();
-    const dest = target.dataset.nav;
-    if (dest.startsWith("mailto:") || dest.startsWith("tel:") || dest.startsWith("https://") || dest.startsWith("http://")) {
-      window.location.href = dest;
-    } else {
-      setView(dest);
-    }
-    return;
+  event.preventDefault();
+  const dest = target.dataset.nav;
+
+  if (
+    dest.startsWith("mailto:") ||
+    dest.startsWith("tel:") ||
+    dest.startsWith("https://") ||
+    dest.startsWith("http://")
+  ) {
+    window.location.href = dest;
+  } else {
+    setView(dest);
+
+    window.scrollTo({
+      top: 0,
+      behavior: "smooth"
+    });
   }
 
-  if (target.dataset.policy) {
-    event.preventDefault();
-    state.policyTab = target.dataset.policy;
-    setView("policy");
-    return;
-  }
+  return;
+}
+
+if (target.dataset.policy) {
+  event.preventDefault();
+  state.policyTab = target.dataset.policy;
+
+  setView("policy");
+
+  window.scrollTo({
+    top: 0,
+    behavior: "smooth"
+  });
+
+  return;
+}
 
   if (target.dataset.back !== undefined) {
     if (state.view === "checkout") {
