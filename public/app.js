@@ -674,12 +674,8 @@ document.addEventListener("submit", async function (e) {
     full_name: form.querySelector('[name="full_name"]').value.trim(),
     mobile: form.querySelector('[name="mobile"]').value.trim(),
     email: form.querySelector('[name="email"]').value.trim(),
-    company_name: form.querySelector('[name="company_name"]').value.trim(),
-    delivery_address: form.querySelector('[name="delivery_address"]').value.trim(),
-    product_name: form.querySelector('[name="product_name"]').value.trim(),
-    quantity: form.querySelector('[name="quantity"]').value,
-    requirements: form.querySelector('[name="requirements"]').value.trim()
-  };
+    company_name: form.querySelector('[name="company_name"]').value.trim()
+};
 
   try {
 
@@ -697,10 +693,8 @@ document.addEventListener("submit", async function (e) {
     if (!response.ok) {
       throw new Error(result.message || "Failed to submit enquiry.");
     }
-
-    alert("Bulk Order Submitted Successfully!");
-
     form.reset();
+    showBulkOrderSuccess();
 
   } catch (error) {
 
@@ -7181,6 +7175,167 @@ function getPolicyContent(tab) {
         gap: 6px;
       }
 
+.bulk-success-modal{
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,.65);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  z-index: 99999;
+}
+
+.bulk-success-card{
+  width: 100%;
+  max-width: 620px;
+  background: linear-gradient(180deg,#2d0b52 0%,#1a0932 100%);
+  border-radius: 24px
+  padding: 40px;
+  text-align: center;
+  color: #fff;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 20px 60px rgba(0,0,0,.45);
+}
+
+.bulk-success-confetti{
+  position:absolute;
+  inset:0;
+  pointer-events:none;
+}
+
+.bulk-success-confetti span{
+  position:absolute;
+  width:8px;
+  height:14px;
+  border-radius:2px;
+}
+
+.bulk-success-confetti span:nth-child(1){top:8%;left:8%;background:#ff4d6d;}
+.bulk-success-confetti span:nth-child(2){top:14%;left:20%;background:#ffd43b;}
+.bulk-success-confetti span:nth-child(3){top:9%;left:38%;background:#51cf66;}
+.bulk-success-confetti span:nth-child(4){top:12%;right:16%;background:#339af0;}
+.bulk-success-confetti span:nth-child(5){top:22%;right:8%;background:#ff922b;}
+.bulk-success-confetti span:nth-child(6){top:26%;left:12%;background:#845ef7;}
+.bulk-success-confetti span:nth-child(7){top:30%;left:28%;background:#20c997;}
+.bulk-success-confetti span:nth-child(8){top:25%;right:28%;background:#fcc419;}
+.bulk-success-confetti span:nth-child(9){top:34%;right:12%;background:#f06595;}
+.bulk-success-confetti span:nth-child(10){top:18%;left:50%;background:#4dabf7;}
+.bulk-success-confetti span:nth-child(11){top:6%;right:36%;background:#69db7c;}
+.bulk-success-confetti span:nth-child(12){top:36%;left:46%;background:#ff8787;}
+
+.bulk-success-check{
+  width:82px;
+  height:82px;
+  margin:0 auto 24px;
+  border-radius:50%;
+  background:#22c55e;
+  color:#fff;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:42px;
+  font-weight:700;
+}
+
+.bulk-success-card h1{
+  margin:0;
+  font-size:36px;
+  font-weight:800;
+}
+
+.bulk-success-card h2{
+  margin:18px 0 12px;
+  font-size:24px;
+  line-height:1.5;
+  font-weight:700;
+}
+
+.bulk-success-card h2 span{
+  display:block;
+}
+
+.bulk-success-desc{
+  color:#d8d4e7;
+  font-size:15px;
+  line-height:1.8;
+  margin-bottom:30px;
+}
+
+.bulk-success-contact{
+  display:flex;
+  align-items:center;
+  gap:18px;
+  text-align:left;
+  background:rgba(255,255,255,.08);
+  border:1px solid rgba(255,255,255,.12);
+  border-radius:18px;
+  padding:20px;
+  margin-bottom:28px;
+}
+
+.bulk-success-icon{
+  width:58px;
+  height:58px;
+  border-radius:50%;
+  background:#ffffff22;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  color:#fff;
+  flex-shrink:0;
+}
+
+.bulk-success-text small{
+  display:block;
+  color:#ddd;
+  font-size:13px;
+}
+
+.bulk-success-text h3{
+  margin:5px 0;
+  font-size:24px;
+  color:#ffffff;
+}
+
+.bulk-success-text p{
+  margin:0;
+  color:#d5d5d5;
+  font-size:14px;
+  line-height:1.6;
+}
+
+.bulk-success-actions{
+  margin-top:10px;
+}
+
+.bulk-success-actions .primary-btn{
+  width:100%;
+  justify-content:center;
+}
+
+@media(max-width:640px){
+
+.bulk-success-card{
+  padding:28px 20px;
+}
+
+.bulk-success-card h1{
+  font-size:28px;
+}
+
+.bulk-success-card h2{
+  font-size:20px;
+}
+
+.bulk-success-contact{
+  flex-direction:column;
+  text-align:center;
+}
+
+}
+
       @media (max-width: 850px) {
         .bulk-wrapper {
           grid-template-columns: 1fr;
@@ -7256,48 +7411,6 @@ function getPolicyContent(tab) {
     >
   </div>
 
-  <div class="bulk-grid">
-
-    <div>
-      <label>Delivery Address <span>*</span></label>
-      <textarea
-        name="delivery_address"
-        placeholder="Enter complete delivery address"
-        required
-      ></textarea>
-    </div>
-
-    <div>
-      <label>Product Name <span>*</span></label>
-      <input
-        type="text"
-        name="product_name"
-        placeholder="Enter product name"
-        required
-      >
-    </div>
-
-    <div>
-      <label>Quantity Required <span>*</span></label>
-      <input
-        type="number"
-        name="quantity"
-        min="1"
-        placeholder="Enter quantity"
-        required
-      >
-    </div>
-
-    <div>
-      <label>Additional Requirements (Optional)</label>
-      <textarea
-        name="requirements"
-        placeholder="Any specific requirements?"
-      ></textarea>
-    </div>
-
-  </div>
-
   <button class="primary-btn full" type="submit">
     ${icon("send")}
     Request Bulk Quote
@@ -7307,6 +7420,7 @@ function getPolicyContent(tab) {
     ${icon("shield")}
     Your information is safe with us and will never be shared.
   </p>
+
 </form>
 
         </div>  
@@ -7391,9 +7505,74 @@ function getPolicyContent(tab) {
       <div class="bulk-footer-trust">
         ${icon("shield")} Your trust is important to us. All bulk order requests are handled with complete confidentiality.
       </div>
+      <div id="bulk-success-modal" class="bulk-success-modal" style="display:none;">
 
+  <div class="bulk-success-card">
+
+    <div class="bulk-success-confetti">
+      <span></span><span></span><span></span><span></span>
+      <span></span><span></span><span></span><span></span>
+      <span></span><span></span><span></span><span></span>
     </div>
-  `;
+
+    <div class="bulk-success-check">
+      ✓
+    </div>
+
+    <h1>
+      Thank You!
+    </h1>
+
+    <h2>
+      Your Bulk Order Request Has Been
+      <span>Submitted Successfully.</span>
+    </h2>
+
+    <p class="bulk-success-desc">
+      Thank you for choosing ZappDeal. Our business team has received your
+      bulk order inquiry and will review your requirements shortly.
+    </p>
+
+    <div class="bulk-success-contact">
+
+      <div class="bulk-success-icon">
+        ${icon("support")}
+      </div>
+
+      <div class="bulk-success-text">
+
+        <small>
+          One of our representatives will contact you within
+        </small>
+
+        <h3>
+          24 Business Hours
+        </h3>
+
+        <p>
+          to discuss pricing, product availability and delivery timelines.
+        </p>
+
+      </div>
+
+          </div>
+
+    <div class="bulk-success-actions">
+      <button
+        class="primary-btn full"
+        type="button"
+        onclick="closeBulkOrderSuccess()"
+      >
+        Back to Home
+      </button>
+    </div>
+
+  </div>
+
+</div>
+
+</div>
+`;
     case "cancellation":
       return `
         <h1>Cancellation Policy</h1>
@@ -8441,7 +8620,21 @@ function backTarget() {
   if (state.view === "cart" || state.view === "categories" || state.view === "search") return "home";
   return "home";
 }
+function showBulkOrderSuccess() {
+  const modal = document.getElementById("bulk-success-modal");
 
+  if (!modal) {
+    console.error("Bulk success modal not found");
+    return;
+  }
+
+  modal.style.display = "flex";
+}
+
+function closeBulkOrderSuccess() {
+  document.getElementById("bulk-success-modal").style.display = "none";
+  setView("home"); // ya setView("bulk-orders") agar wahi page rakhna ho
+}
 function showExitConfirmationModal() {
   const existing = document.getElementById('exit-confirm-modal');
   if (existing) existing.remove();

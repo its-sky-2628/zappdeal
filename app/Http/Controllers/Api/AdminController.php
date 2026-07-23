@@ -7,9 +7,11 @@ use App\Models\Coupon;
 use App\Models\IphoneModel;
 use App\Models\ShopByStyle;
 use App\Models\User;
+use App\Models\BulkOrder;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+
 
 class AdminController extends Controller
 {
@@ -126,7 +128,12 @@ class AdminController extends Controller
 
         return response()->json(ShopByStyle::all());
     }
-
+    public function bulkOrders(): JsonResponse
+    {
+    return response()->json(
+        BulkOrder::latest()->get()
+    );
+    }
     private function coupon(Request $r, bool $p = false): array
     {
         $x = $p ? 'sometimes' : 'required';

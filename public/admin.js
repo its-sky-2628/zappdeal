@@ -500,7 +500,91 @@ async function loadAdminOrdersFromApi() {
         console.error(e);
     }
 }
+async function loadBulkOrdersFromApi() {
 
+    console.log("✅ Bulk Orders function called");
+
+    try {
+
+        const token = localStorage.getItem("admin-user-token");
+
+        console.log("Token:", token);
+
+        if (!token || token === "null" || token === "undefined") {
+            console.log("❌ Token not found");
+            return;
+        }
+
+        const res = await fetch("/api/admin/bulk-orders", {
+            headers: {
+                Authorization: "Bearer " + token,
+                Accept: "application/json"
+            }
+        });
+
+        console.log("API Status:", res.status);
+
+        if (res.status === 401) {
+            handleSessionExpired();
+            return;
+        }
+
+        if (!res.ok) {
+            throw new Error("Unable to load bulk orders");
+        }
+
+        const data = await res.json();
+
+        console.log("Bulk Orders Response:", data);
+
+        const table = document.getElementById("bulk-orders-panel-table");
+
+        console.log("Table Element:", table);
+
+        document.getElementById("bulk-orders-total").textContent = data.length;
+        document.getElementById("bulk-orders-pending").textContent = data.length;
+        document.getElementById("bulk-orders-contacted").textContent = 0;
+
+        document.getElementById("bulk-orders-panel-count").textContent =
+            `${data.length} Requests`;
+
+        if (!table) return;
+
+        if (data.length === 0) {
+            table.innerHTML = `
+                <tr>
+                    <td colspan="9" style="text-align:center;padding:40px;">
+                        No Bulk Orders Found
+                    </td>
+                </tr>
+            `;
+            return;
+        }
+
+        table.innerHTML = data.map(order => `
+            <tr>
+                <td>${order.full_name}</td>
+                <td>${order.email}</td>
+                <td>${order.mobile}</td>
+                <td>${order.company_name ?? "-"}</td>
+                <td>${order.quantity}</td>
+                <td>${order.requirements ?? "-"}</td>
+                <td>${new Date(order.created_at).toLocaleDateString()}</td>
+                <td>Pending</td>
+                <td>
+                    <button class="btn-teal">View</button>
+                </td>
+            </tr>
+        `).join("");
+
+        console.log("✅ Table Rendered Successfully");
+
+    } catch (e) {
+
+        console.error("❌ Bulk Orders Error:", e);
+
+    }
+}
 function updateOrdersBadge() {
   const badge = document.getElementById("orders-nav-badge");
   if (!badge) return;
@@ -4809,6 +4893,7 @@ async function handleLogin() {
           showToast("Logged in successfully");
           loadUsersFromApi(); // reload after login
           loadAdminOrdersFromApi(); // reload orders after login
+          loadBulkOrdersFromApi(); // reload bulk orders after login
       } else {
           showToast("Invalid admin credentials");
       }
@@ -7159,6 +7244,8 @@ setInterval(() => {
   if (localStorage.getItem("admin-authenticated") === "true" && token && token !== "null" && token !== "undefined") {
     loadUsersFromApi();
     loadAdminOrdersFromApi();
+    loadAdminOrdersFromApi();
+    loadBulkOrdersFromApi();
     loadProductsFromApi();
     loadCouponsFromApi();
     loadWalletsFromApi();

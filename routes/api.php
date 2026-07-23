@@ -72,6 +72,7 @@ Route::middleware('auth:sanctum')->group(function () {
 });
 
 Route::middleware(['auth:sanctum', 'admin'])->group(function () {
+    Route::get('/admin/bulk-orders', [AdminController::class, 'bulkOrders']);
     Route::get('/admin/trigger-mail-template', [TriggerMailController::class, 'show']);
     Route::put('/admin/trigger-mail-template', [TriggerMailController::class, 'update']);
     Route::post('/admin/trigger-mail-template/test', [TriggerMailController::class, 'test']);
