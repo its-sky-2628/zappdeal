@@ -233,10 +233,12 @@
               <span class="img-lightbox-counter" id="img-lightbox-counter">1 / 1</span>
               <button class="img-lightbox-arrow" id="img-lightbox-next" aria-label="Next image">&#8594;</button>
             </div>
-            <div class="img-lightbox-dots" id="img-lightbox-dots"></div>
-          </div>
-        </div>
-      </main>
+                    <div class="img-lightbox-dots" id="img-lightbox-dots"></div>
+      </div>
+    </div>
+
+    <!-- Order Success Modal -->
+    
 
       <footer class="desktop-footer" aria-label="Footer">
         <div class="footer-grid">

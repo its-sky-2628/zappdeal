@@ -553,7 +553,7 @@ async function loadBulkOrdersFromApi() {
         if (data.length === 0) {
             table.innerHTML = `
                 <tr>
-                    <td colspan="9" style="text-align:center;padding:40px;">
+                    <td colspan="7" style="text-align:center;padding:40px;">
                         No Bulk Orders Found
                     </td>
                 </tr>
@@ -563,18 +563,12 @@ async function loadBulkOrdersFromApi() {
 
         table.innerHTML = data.map(order => `
             <tr>
-                <td>${order.full_name}</td>
-                <td>${order.email}</td>
-                <td>${order.mobile}</td>
-                <td>${order.company_name ?? "-"}</td>
-                <td>${order.quantity}</td>
-                <td>${order.requirements ?? "-"}</td>
-                <td>${new Date(order.created_at).toLocaleDateString()}</td>
-                <td>Pending</td>
-                <td>
-                    <button class="btn-teal">View</button>
-                </td>
-            </tr>
+    <td>${order.full_name}</td>
+    <td>${order.email}</td>
+    <td>${order.mobile}</td>
+    <td>${order.company_name ?? "-"}</td>
+    <td>${formatDate(order.created_at)}<br><small style="color:#8b5cf6;">🕒 ${formatTime(order.created_at)}</small></td>
+</tr>
         `).join("");
 
         console.log("✅ Table Rendered Successfully");

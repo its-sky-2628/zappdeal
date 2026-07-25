@@ -49,7 +49,7 @@
         </div>
 
         <nav class="side-nav">
-          <button class="side-link is-active" data-panel="dashboard"><span data-icon="dashboard"></span>Dashboard TEST</button>
+          <button class="side-link is-active" data-panel="dashboard"><span data-icon="dashboard"></span>Dashboard</button>
           <button class="side-link" data-panel="users"><span data-icon="users"></span>Customers</button>   <!--Customers -->
           <button class="side-link" data-panel="payouts"><span data-icon="wallet"></span>Payouts <span class="nav-badge" id="payouts-nav-badge" style="display: none;">0</span></button>
           <button class="side-link" data-panel="orders"><span data-icon="orders"></span>Orders <span class="nav-badge" id="orders-nav-badge" style="display: none;">0</span></button>
@@ -1078,11 +1078,8 @@
                       <th>Email</th>
                       <th>Phone</th>
                       <th>Company</th>
-                      <th>Quantity</th>
-                      <th>Message</th>
                       <th>Date</th>
-                      <th>Status</th>
-                      <th>Action</th>
+                  
                     </tr>
                   </thead>
                   <tbody id="bulk-orders-panel-table">

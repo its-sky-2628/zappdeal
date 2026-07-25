@@ -169,6 +169,94 @@ window.selectVariantAndBase = function(baseModel, variant) {
   state.selectedBaseModel = baseModel;
   window.selectProductModel(variant);
 };
+/* ===== Custom Model Dropdown (replaces native <select>) ===== */
+
+function closeAllModelDropdowns(except) {
+  document.querySelectorAll('.model-dd.is-open').forEach((dd) => {
+    if (dd === except) return;
+    dd.classList.remove('is-open');
+    const trigger = dd.querySelector('.model-dd-trigger');
+    if (trigger) trigger.setAttribute('aria-expanded', 'false');
+  });
+}
+
+window.toggleModelDropdown = function (triggerBtn, evt) {
+  if (evt) evt.stopPropagation();
+  const dd = triggerBtn.closest('.model-dd');
+  if (!dd) return;
+  const isOpen = dd.classList.contains('is-open');
+
+  // Only one dropdown open at a time
+  closeAllModelDropdowns(isOpen ? null : dd);
+
+  if (isOpen) {
+    dd.classList.remove('is-open');
+    triggerBtn.setAttribute('aria-expanded', 'false');
+  } else {
+    dd.classList.add('is-open');
+    triggerBtn.setAttribute('aria-expanded', 'true');
+    const selected = dd.querySelector('.model-dd-option.is-selected') || dd.querySelector('.model-dd-option');
+    if (selected) selected.focus();
+  }
+};
+
+window.chooseModelVariant = function (optionEl, baseModel, variant) {
+  closeAllModelDropdowns();
+  // Uses your existing logic untouched
+  window.selectVariantAndBase(baseModel, variant);
+};
+
+window.handleModelDropdownKey = function (evt, triggerBtn) {
+  const dd = triggerBtn.closest('.model-dd');
+  if (!dd) return;
+
+  if (evt.key === 'Enter' || evt.key === ' ' || evt.key === 'ArrowDown' || evt.key === 'ArrowUp') {
+    evt.preventDefault();
+    if (!dd.classList.contains('is-open')) {
+      window.toggleModelDropdown(triggerBtn);
+    } else {
+      const options = dd.querySelectorAll('.model-dd-option');
+      if (options.length) options[0].focus();
+    }
+  } else if (evt.key === 'Escape') {
+    closeAllModelDropdowns();
+  }
+};
+
+window.handleModelOptionKey = function (evt, optionEl) {
+  const dd = optionEl.closest('.model-dd');
+  if (!dd) return;
+  const options = Array.from(dd.querySelectorAll('.model-dd-option'));
+  const idx = options.indexOf(optionEl);
+
+  if (evt.key === 'ArrowDown') {
+    evt.preventDefault();
+    (options[idx + 1] || options[0]).focus();
+  } else if (evt.key === 'ArrowUp') {
+    evt.preventDefault();
+    (options[idx - 1] || options[options.length - 1]).focus();
+  } else if (evt.key === 'Enter' || evt.key === ' ') {
+    evt.preventDefault();
+    optionEl.click();
+  } else if (evt.key === 'Escape') {
+    evt.preventDefault();
+    closeAllModelDropdowns();
+    dd.querySelector('.model-dd-trigger')?.focus();
+  } else if (evt.key === 'Tab') {
+    closeAllModelDropdowns();
+  }
+};
+
+// Global listeners — attached once, survive re-renders
+if (!window.__modelDropdownGlobalListenersAttached) {
+  window.__modelDropdownGlobalListenersAttached = true;
+  document.addEventListener('click', (e) => {
+    if (!e.target.closest('.model-dd')) closeAllModelDropdowns();
+  });
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') closeAllModelDropdowns();
+  });
+}
 
 function normalizeProductModels(product) {
   if (!product) return [];
@@ -274,9 +362,9 @@ function resolveImageUrl(image) {
   if (url && !url.startsWith('/') && !url.startsWith('http')) {
     url = '/' + url;
   }
-  if (url.startsWith('/uploads/')) {
+  if (url.startsWith('/uploads/') && !url.includes('?v=')) {
     url = `${url}?v=1.0.2`;
-  }
+}
   return url;
 }
 
@@ -342,6 +430,7 @@ function getProductRawImages(product) {
 }
 
 function getProductSlides(product, selectedColor = state.selectedColor, selectedModel = state.selectedModel) {
+  console.log(JSON.stringify(product.images, null, 2));
   const isMobile = isMobileProduct(product);
   const coverImage = resolveImageUrl(product.image) || "assets/phone-case.png";
 
@@ -2588,15 +2677,30 @@ function renderProduct() {
   }
 
   const groups = groupProductModels(productModels);
-  const baseModels = Object.keys(groups);
 
-  if (state.selectedModel) {
-    const base = getBaseModel(state.selectedModel);
-    if (baseModels.includes(base)) {
-      state.selectedBaseModel = base;
-    }
+const baseModels = Object.keys(groups)
+  .filter(model => {
+    const match = model.toLowerCase().match(/iphone\s+(\d+)/);
+
+    if (!match) return false;
+
+    const version = parseInt(match[1], 10);
+
+    return version >= 13;
+  })
+  .sort((a, b) => {
+    const versionA = parseInt(a.match(/\d+/)?.[0] || "0", 10);
+    const versionB = parseInt(b.match(/\d+/)?.[0] || "0", 10);
+
+    return versionB - versionA; // Latest model first
+  });
+
+if (state.selectedModel) {
+  const base = getBaseModel(state.selectedModel);
+  if (baseModels.includes(base)) {
+    state.selectedBaseModel = base;
   }
-
+}
   const discountPercent = Math.round((1 - product.price / product.oldPrice) * 100) || 0;
   const slides = getProductSlides(product, state.selectedColor);
 
@@ -2759,20 +2863,42 @@ function renderProduct() {
         <div class="model-selection-section" id="model-selection-section" style="margin-bottom: 12px; border-radius: 10px;">
           <h2 style="font-size: 12px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text); margin: 0 0 6px 0;">Select Model</h2>
           
-          <!-- Base Model Dropdowns Row -->
-          <div class="base-models-pills" style="display: flex; gap: 8px; overflow-x: auto; padding-bottom: 6px; margin-bottom: 8px; scrollbar-width: none; -webkit-overflow-scrolling: touch;">
+        <!-- Base Model Dropdowns Row (Custom Dropdown UI) -->
+          <div class="base-models-pills model-dd-row">
             ${baseModels.map((base) => {
               const isActive = state.selectedBaseModel === base;
               const variants = groups[base] || [];
+              const safeBase = base.replace(/'/g, "\\'");
+              const triggerLabel = isActive ? state.selectedModel : base;
               return `
-                <div class="model-pill-select-container ${isActive ? 'is-active' : ''}">
-                  <select class="model-pill-select" onchange="window.selectVariantAndBase('${base.replace(/'/g, "\\'")}', this.value)">
-                    ${isActive ? '' : `<option value="" disabled selected hidden>${base}</option>`}
+                <div class="model-dd" data-base="${base}">
+                  <button type="button"
+                          class="model-dd-trigger ${isActive ? 'is-active' : ''}"
+                          aria-haspopup="listbox"
+                          aria-expanded="false"
+                          onclick="window.toggleModelDropdown(this, event)"
+                          onkeydown="window.handleModelDropdownKey(event, this)">
+                    <span class="model-dd-label">${triggerLabel}</span>
+                    <svg class="model-dd-arrow" width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <path d="M2.5 4.5L6 8L9.5 4.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                  </button>
+                  <ul class="model-dd-menu" role="listbox">
                     ${variants.map((variant) => {
                       const isVariantSelected = state.selectedModel === variant;
-                      return `<option value="${variant}" ${isVariantSelected ? "selected" : ""}>${variant}</option>`;
+                      const safeVariant = variant.replace(/'/g, "\\'");
+                      return `
+                        <li role="option"
+                            class="model-dd-option ${isVariantSelected ? 'is-selected' : ''}"
+                            tabindex="-1"
+                            aria-selected="${isVariantSelected}"
+                            onclick="window.chooseModelVariant(this, '${safeBase}', '${safeVariant}')"
+                            onkeydown="window.handleModelOptionKey(event, this)">
+                          ${variant}
+                        </li>
+                      `;
                     }).join("")}
-                  </select>
+                  </ul>
                 </div>
               `;
             }).join("")}
@@ -7175,166 +7301,136 @@ function getPolicyContent(tab) {
         gap: 6px;
       }
 
-.bulk-success-modal{
-  position: fixed;
-  inset: 0;
-  background: rgba(0,0,0,.65);
-  display: none;
-  align-items: center;
-  justify-content: center;
-  padding: 20px;
-  z-index: 99999;
+      /* ==========================================
+   SUCCESS MODAL POPUP
+========================================== */
+
+.modal-overlay{
+    position:fixed;
+    top:0;
+    left:0;
+    width:100vw;
+    height:100vh;
+    background:rgba(0,0,0,.75);
+    backdrop-filter:blur(5px);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    opacity:0;
+    visibility:hidden;
+    transition:.3s;
+    z-index:99999;
 }
 
-.bulk-success-card{
-  width: 100%;
-  max-width: 620px;
-  background: linear-gradient(180deg,#2d0b52 0%,#1a0932 100%);
-  border-radius: 24px
-  padding: 40px;
-  text-align: center;
-  color: #fff;
-  position: relative;
-  overflow: hidden;
-  box-shadow: 0 20px 60px rgba(0,0,0,.45);
+.modal-overlay.active{
+    opacity:1;
+    visibility:visible;
 }
 
-.bulk-success-confetti{
-  position:absolute;
-  inset:0;
-  pointer-events:none;
+.modal-card{
+    background:#151622;
+    border:1px solid #2d3148;
+    width:100%;
+    max-width:440px;
+    border-radius:20px;
+    padding:36px 28px 28px;
+    position:relative;
+    text-align:center;
+    overflow:hidden;
+    box-shadow:0 20px 50px rgba(0,0,0,.6);
+    transform:scale(.8);
+    transition:.3s;
 }
 
-.bulk-success-confetti span{
-  position:absolute;
-  width:8px;
-  height:14px;
-  border-radius:2px;
+.modal-overlay.active .modal-card{
+    transform:scale(1);
 }
 
-.bulk-success-confetti span:nth-child(1){top:8%;left:8%;background:#ff4d6d;}
-.bulk-success-confetti span:nth-child(2){top:14%;left:20%;background:#ffd43b;}
-.bulk-success-confetti span:nth-child(3){top:9%;left:38%;background:#51cf66;}
-.bulk-success-confetti span:nth-child(4){top:12%;right:16%;background:#339af0;}
-.bulk-success-confetti span:nth-child(5){top:22%;right:8%;background:#ff922b;}
-.bulk-success-confetti span:nth-child(6){top:26%;left:12%;background:#845ef7;}
-.bulk-success-confetti span:nth-child(7){top:30%;left:28%;background:#20c997;}
-.bulk-success-confetti span:nth-child(8){top:25%;right:28%;background:#fcc419;}
-.bulk-success-confetti span:nth-child(9){top:34%;right:12%;background:#f06595;}
-.bulk-success-confetti span:nth-child(10){top:18%;left:50%;background:#4dabf7;}
-.bulk-success-confetti span:nth-child(11){top:6%;right:36%;background:#69db7c;}
-.bulk-success-confetti span:nth-child(12){top:36%;left:46%;background:#ff8787;}
-
-.bulk-success-check{
-  width:82px;
-  height:82px;
-  margin:0 auto 24px;
-  border-radius:50%;
-  background:#22c55e;
-  color:#fff;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  font-size:42px;
-  font-weight:700;
+.close-modal{
+    position:absolute;
+    top:16px;
+    right:16px;
+    width:30px;
+    height:30px;
+    border-radius:50%;
+    border:1px solid rgba(255,255,255,.08);
+    background:rgba(255,255,255,.05);
+    color:#bbb;
+    cursor:pointer;
+    display:flex;
+    align-items:center;
+    justify-content:center;
 }
 
-.bulk-success-card h1{
-  margin:0;
-  font-size:36px;
-  font-weight:800;
+.success-icon-wrapper{
+    margin:0 auto 20px;
+    width:fit-content;
 }
 
-.bulk-success-card h2{
-  margin:18px 0 12px;
-  font-size:24px;
-  line-height:1.5;
-  font-weight:700;
+.success-icon{
+    width:76px;
+    height:76px;
+    margin:auto;
+    border-radius:50%;
+    background:#22c55e;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    color:#fff;
+    box-shadow:0 0 30px rgba(34,197,94,.45);
 }
 
-.bulk-success-card h2 span{
-  display:block;
+.success-icon svg{
+    width:42px;
+    height:42px;
 }
 
-.bulk-success-desc{
-  color:#d8d4e7;
-  font-size:15px;
-  line-height:1.8;
-  margin-bottom:30px;
+.modal-body h2{
+    font-size:30px;
+    font-weight:700;
+    margin:18px 0 10px;
 }
 
-.bulk-success-contact{
-  display:flex;
-  align-items:center;
-  gap:18px;
-  text-align:left;
-  background:rgba(255,255,255,.08);
-  border:1px solid rgba(255,255,255,.12);
-  border-radius:18px;
-  padding:20px;
-  margin-bottom:28px;
+.primary-msg{
+    color:#ddd;
+    line-height:1.6;
+    margin-bottom:8px;
 }
 
-.bulk-success-icon{
-  width:58px;
-  height:58px;
-  border-radius:50%;
-  background:#ffffff22;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  color:#fff;
-  flex-shrink:0;
+.secondary-msg{
+    color:#999;
+    margin-bottom:24px;
 }
 
-.bulk-success-text small{
-  display:block;
-  color:#ddd;
-  font-size:13px;
+.okay-btn{
+    width:100%;
+    border:none;
+    border-radius:10px;
+    padding:13px;
+    background:#22c55e;
+    color:#fff;
+    font-size:15px;
+    font-weight:700;
+    cursor:pointer;
 }
 
-.bulk-success-text h3{
-  margin:5px 0;
-  font-size:24px;
-  color:#ffffff;
+.confetti-bg{
+    position:absolute;
+    inset:0;
+    pointer-events:none;
 }
 
-.bulk-success-text p{
-  margin:0;
-  color:#d5d5d5;
-  font-size:14px;
-  line-height:1.6;
+.shape{
+    position:absolute;
+    border-radius:2px;
 }
 
-.bulk-success-actions{
-  margin-top:10px;
-}
-
-.bulk-success-actions .primary-btn{
-  width:100%;
-  justify-content:center;
-}
-
-@media(max-width:640px){
-
-.bulk-success-card{
-  padding:28px 20px;
-}
-
-.bulk-success-card h1{
-  font-size:28px;
-}
-
-.bulk-success-card h2{
-  font-size:20px;
-}
-
-.bulk-success-contact{
-  flex-direction:column;
-  text-align:center;
-}
-
-}
+.shape-1{top:40px;left:50px;width:6px;height:6px;background:#22c55e;transform:rotate(45deg);}
+.shape-2{top:70px;left:80px;width:14px;height:4px;background:#22c55e;border-radius:10px;transform:rotate(-30deg);}
+.shape-3{top:120px;left:40px;width:8px;height:8px;background:#a855f7;transform:rotate(15deg);}
+.shape-4{top:35px;right:100px;width:6px;height:6px;background:#a855f7;}
+.shape-5{top:80px;right:60px;width:6px;height:6px;background:#22c55e;border-radius:50%;}
+.shape-6{top:130px;right:80px;width:12px;height:4px;background:#a855f7;transform:rotate(40deg);}
 
       @media (max-width: 850px) {
         .bulk-wrapper {
@@ -7505,71 +7601,46 @@ function getPolicyContent(tab) {
       <div class="bulk-footer-trust">
         ${icon("shield")} Your trust is important to us. All bulk order requests are handled with complete confidentiality.
       </div>
-      <div id="bulk-success-modal" class="bulk-success-modal" style="display:none;">
+      <div id="bulk-success-modal" class="modal-overlay">
 
-  <div class="bulk-success-card">
+    <div class="modal-card">
 
-    <div class="bulk-success-confetti">
-      <span></span><span></span><span></span><span></span>
-      <span></span><span></span><span></span><span></span>
-      <span></span><span></span><span></span><span></span>
+        <button class="close-modal" onclick="closeBulkOrderSuccess()">✕</button>
+
+        <div class="confetti-bg">
+            <span class="shape shape-1"></span>
+            <span class="shape shape-2"></span>
+            <span class="shape shape-3"></span>
+            <span class="shape shape-4"></span>
+            <span class="shape shape-5"></span>
+            <span class="shape shape-6"></span>
+        </div>
+
+        <div class="modal-body">
+
+            <div class="success-icon-wrapper">
+                <div class="success-icon">
+                    ✓
+                </div>
+            </div>
+
+            <h2>Thank You!</h2>
+
+            <p class="primary-msg">
+                Your bulk quote request has been submitted successfully.
+            </p>
+
+            <p class="secondary-msg">
+                Our team will contact you shortly.
+            </p>
+
+            <button class="okay-btn" onclick="closeBulkOrderSuccess()">
+                ✓ Okay
+            </button>
+
+        </div>
+
     </div>
-
-    <div class="bulk-success-check">
-      ✓
-    </div>
-
-    <h1>
-      Thank You!
-    </h1>
-
-    <h2>
-      Your Bulk Order Request Has Been
-      <span>Submitted Successfully.</span>
-    </h2>
-
-    <p class="bulk-success-desc">
-      Thank you for choosing ZappDeal. Our business team has received your
-      bulk order inquiry and will review your requirements shortly.
-    </p>
-
-    <div class="bulk-success-contact">
-
-      <div class="bulk-success-icon">
-        ${icon("support")}
-      </div>
-
-      <div class="bulk-success-text">
-
-        <small>
-          One of our representatives will contact you within
-        </small>
-
-        <h3>
-          24 Business Hours
-        </h3>
-
-        <p>
-          to discuss pricing, product availability and delivery timelines.
-        </p>
-
-      </div>
-
-          </div>
-
-    <div class="bulk-success-actions">
-      <button
-        class="primary-btn full"
-        type="button"
-        onclick="closeBulkOrderSuccess()"
-      >
-        Back to Home
-      </button>
-    </div>
-
-  </div>
-
-</div>
 
 </div>
 `;
@@ -7587,6 +7658,7 @@ function getPolicyContent(tab) {
             <li>Stock unavailable</li>
             <li>Technical payment failure</li>
           </ul>
+          
           <p>If cancellation is approved, refund timelines depend on payment providers.</p>
         </section>
         <section>
@@ -8201,7 +8273,7 @@ function renderCheckout() {
 
   // Step 2 Place Order CTA
   const step2CtaHtml = `
-    <button class="primary-btn full" data-place-order
+    <button type="button" class="primary-btn full" data-place-order
       style="width:100%; padding:16px; border-radius:12px; background:#8b5cf6; color:white; border:none; font-weight:700; font-size:15px; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:8px; box-shadow:0 4px 24px rgba(139,92,246,0.35); transition: background-color 0.2s;"
       onmouseover="this.style.background='#7c3aed'"
       onmouseout="this.style.background='#8b5cf6'">
@@ -8608,9 +8680,13 @@ function setView(view, fromHashChange = false, skipScroll = false) {
   }
   
   // FIX: Auto-scroll line completely commented out to stop page jumping completely
-  // if (!fromHashChange && previousView !== view && !skipScroll) {
-  //   window.scrollTo({ top: 0, behavior: "instant" });
-  // }
+  if (!fromHashChange && previousView !== view && !skipScroll) {
+  window.scrollTo({
+    top: 0,
+    left: 0,
+    behavior: "instant"
+  });
+}
 }
 
 function backTarget() {
@@ -8628,12 +8704,60 @@ function showBulkOrderSuccess() {
     return;
   }
 
-  modal.style.display = "flex";
+  // Modal ko <body> mein move karo taaki position:fixed poore
+  // viewport ke hisaab se center ho, na ki .policy-content-panel
+  // (jispe backdrop-filter hai) ke andar trap ho.
+  if (modal.parentElement !== document.body) {
+    document.body.appendChild(modal);
+  }
+
+  modal.classList.add("active");
+}
+function closeBulkOrderSuccess() {
+  const modal = document.getElementById("bulk-success-modal");
+  if (modal) modal.remove();   
+  setView("home");
 }
 
-function closeBulkOrderSuccess() {
-  document.getElementById("bulk-success-modal").style.display = "none";
-  setView("home"); // ya setView("bulk-orders") agar wahi page rakhna ho
+function showOrderSuccess() {
+    let modal = document.getElementById("order-success-modal");
+
+    if (!modal) {
+        modal = document.createElement("div");
+        modal.id = "order-success-modal";
+        modal.className = "modal-overlay";
+        modal.innerHTML = `
+    <div class="modal-card">
+        <button class="close-modal" onclick="closeOrderSuccess()">✕</button>
+        <div class="confetti-bg">
+            <span class="shape shape-1"></span>
+            <span class="shape shape-2"></span>
+            <span class="shape shape-3"></span>
+            <span class="shape shape-4"></span>
+            <span class="shape shape-5"></span>
+            <span class="shape shape-6"></span>
+        </div>
+        <div class="modal-body">
+            <div class="success-icon-wrapper">
+                <div class="success-icon">✓</div>
+            </div>
+            <h2>Order Placed!</h2>
+            <p class="primary-msg">Your order has been successfully placed.</p>
+            <p class="secondary-msg">Thank you for shopping with ZappDeal.</p>
+            <button class="okay-btn" onclick="closeOrderSuccess()">✓ Okay</button>
+        </div>
+    </div>`;
+        document.body.appendChild(modal);
+        modal.offsetHeight; // force reflow so the CSS transition runs
+    }
+
+    modal.classList.add("active");
+}
+
+function closeOrderSuccess() {
+    const modal = document.getElementById("order-success-modal");
+    if (modal) modal.classList.remove("active");
+    setView("home");
 }
 function showExitConfirmationModal() {
   const existing = document.getElementById('exit-confirm-modal');
@@ -8832,24 +8956,41 @@ if (target.dataset.policy) {
   }
 
   if (target.dataset.category) {
-    event.preventDefault();
-    state.selectedCategory = target.dataset.category;
-    renderAll();
-    setView("categories");
-    return;
-  }
+  console.log("CATEGORY CLICK:", target.dataset.category);
+
+  event.preventDefault();
+
+  state.selectedCategory = target.dataset.category;
+  renderAll();
+  setView("categories");
+
+  window.scrollTo(0, 0);
+
+  return;
+}
 
   if (target.dataset.openProduct) {
     state.productId = target.dataset.openProduct;
-    if (target.id === "purchase-notification-widget" || target.closest("#purchase-notification-widget")) {
-      if (typeof recentPurchasePopupManager !== "undefined") {
-        recentPurchasePopupManager.close();
-      }
-    }
-    clearSearchInputs();
-    renderAll();
-    setView("product");
-    return;
+
+if (target.id === "purchase-notification-widget" || target.closest("#purchase-notification-widget")) {
+  if (typeof recentPurchasePopupManager !== "undefined") {
+    recentPurchasePopupManager.close();
+  }
+}
+
+clearSearchInputs();
+renderAll();
+setView("product");
+
+requestAnimationFrame(() => {
+  window.scrollTo({
+    top: 0,
+    left: 0,
+    behavior: "instant"
+  });
+});
+
+return;
   }
 
   if (target.dataset.shareProduct) {
@@ -8996,6 +9137,7 @@ if (target.dataset.policy) {
         }
 
         const res = await fetch('/api/orders', {
+          
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -9004,7 +9146,6 @@ if (target.dataset.policy) {
             },
             body: JSON.stringify(bodyObj)
         });
-        
         if (res.ok) {
             const placedOrder = await res.json();
 
@@ -9031,21 +9172,36 @@ if (target.dataset.policy) {
 
             await loadAddressesFromApi();
             await loadOrdersFromApi();
-            state.cart = {};
-            persistCart();
-            hideLoading();
-            renderAll();
-            if (typeof fbq === "function") {
-                fbq('track', 'Purchase', {
-                    content_ids: [placedOrder.product_id ? placedOrder.product_id.toString() : ''],
-                    content_type: 'product',
-                    value: placedOrder.total,
-                    currency: 'INR'
-                }, { eventID: 'ord_' + placedOrder.id });
-            }
-            setView("thankyou");
-            triggerCelebration();
-            showToast("Order placed successfully");
+
+state.cart = {};
+persistCart();
+
+hideLoading();
+
+try {
+
+    renderAll();
+
+    if (typeof fbq === "function") {
+        fbq('track', 'Purchase', {
+            content_ids: [placedOrder.product_id ? placedOrder.product_id.toString() : ''],
+            content_type: 'product',
+            value: placedOrder.total,
+            currency: 'INR'
+        }, { eventID: 'ord_' + placedOrder.id });
+    }
+
+    showOrderSuccess();
+
+    triggerCelebration();
+
+} catch (e) {
+
+    console.error("ERROR AFTER ORDER:", e);
+
+    alert(e.message);
+
+}
         } else {
             const errData = await res.json();
             hideLoading();
@@ -10509,11 +10665,19 @@ const searchSuggestionsManager = {
         const productId = el.getAttribute("data-product-id");
         const searchTerm = el.getAttribute("data-search-term");
         if (productId) {
-          this.hide();
-          state.productId = productId;
-          clearSearchInputs();
-          renderAll();
-          setView("product");
+         this.hide();
+         state.productId = productId;
+         clearSearchInputs();
+         renderAll();
+         setView("product");
+
+         requestAnimationFrame(() => {
+          window.scrollTo({
+          top: 0,
+          left: 0,
+          behavior: "instant"
+        });
+});
         } else {
           this.selectSuggestion(searchTerm);
         }

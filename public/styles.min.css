@@ -7026,7 +7026,107 @@ html, body, .site-shell, .view {
   border-color: transparent;
   box-shadow: 0 0 16px rgba(168, 85, 247, 0.35);
 }
+/* ===== NEW CUSTOM MODEL DROPDOWN ===== */
 
+.model-pill-btn{
+
+    appearance:none;
+
+    width:170px;
+
+    min-height:38px;
+
+    border-radius:20px;
+
+    border:1px solid rgba(124,58,237,.25);
+
+    background:rgba(124,58,237,.06);
+
+    color:#e2e8f0;
+
+    font-size:13px;
+
+    font-weight:700;
+
+    padding:8px 14px;
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:space-between;
+
+    cursor:pointer;
+
+    transition:.2s;
+
+    box-shadow:0 0 6px rgba(124,58,237,.12);
+
+}
+
+.model-pill-btn:hover{
+
+    background:rgba(124,58,237,.15);
+
+    border-color:rgba(124,58,237,.55);
+
+}
+
+.variant-dropdown{
+
+    position:absolute;
+
+    left:0;
+
+    bottom:calc(100% + 8px);
+
+    width:210px;
+
+    display:none;
+
+    background:#121425;
+
+    border-radius:16px;
+
+    border:1px solid rgba(255,255,255,.08);
+
+    overflow:hidden;
+
+    z-index:999999;
+
+    box-shadow:0 20px 40px rgba(0,0,0,.45);
+
+}
+
+.variant-dropdown.show{
+
+    display:block;
+
+}
+
+.variant-item{
+
+    padding:12px 16px;
+
+    color:#fff;
+
+    cursor:pointer;
+
+    transition:.18s;
+
+}
+
+.variant-item:hover{
+
+    background:#7c3aed;
+
+}
+
+.variant-item.active{
+
+    background:linear-gradient(135deg,#06b6d4,#2563eb);
+
+}
 .model-pill-select-container.is-active::after {
   border-top-color: #fff;
 }
@@ -8925,4 +9025,134 @@ body.cart-page-active .app-frame {
 /* Fix bottom black gap on checkout and cart pages */
 body.checkout-mode {
   padding-bottom: 0 !important;
+}
+/* ===== Custom Model Dropdown (Premium / Apple-Nothing style) ===== */
+.model-dd-row {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  column-gap: 14px;
+  row-gap: 14px;
+  margin-bottom: 8px;
+}
+
+@media (max-width: 768px) {
+  .model-dd-row {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    column-gap: 10px;
+    row-gap: 10px;
+  }
+}
+
+.model-dd {
+  position: relative;
+  width: 100%;
+}
+
+.model-dd-trigger {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 10px 14px;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text, #fff);
+  background: rgba(255, 255, 255, 0.04);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.10);
+  border-radius: 13px;
+  cursor: pointer;
+  transition: border-color 0.2s ease, background 0.2s ease, box-shadow 0.2s ease;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25);
+}
+
+.model-dd-trigger:hover,
+.model-dd-trigger:focus-visible {
+  border-color: rgba(168, 85, 247, 0.55);
+  background: rgba(168, 85, 247, 0.08);
+  box-shadow: 0 6px 20px rgba(168, 85, 247, 0.18);
+  outline: none;
+}
+
+.model-dd-trigger.is-active {
+  background: linear-gradient(135deg, rgba(168, 85, 247, 0.22), rgba(124, 58, 237, 0.14));
+  border-color: rgba(168, 85, 247, 0.65);
+  box-shadow: 0 6px 20px rgba(168, 85, 247, 0.25);
+}
+
+.model-dd-label {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.model-dd-arrow {
+  flex-shrink: 0;
+  color: rgba(255, 255, 255, 0.65);
+  transition: transform 0.2s ease;
+}
+
+.model-dd.is-open .model-dd-arrow {
+  transform: rotate(180deg);
+  color: #a855f7;
+}
+
+/* Dropdown opens UPWARD, above the trigger button */
+.model-dd-menu {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: calc(100% + 8px);
+  list-style: none;
+  margin: 0;
+  padding: 6px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  background: rgba(20, 20, 24, 0.85);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.10);
+  border-radius: 14px;
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.55), 0 4px 12px rgba(0, 0, 0, 0.35);
+  z-index: 60;
+  transform-origin: bottom center;
+  opacity: 0;
+  transform: translateY(8px) scale(0.96);
+  pointer-events: none;
+  transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+.model-dd.is-open .model-dd-menu {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+  pointer-events: auto;
+}
+
+.model-dd-option {
+  padding: 9px 12px;
+  font-size: 13px;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.85);
+  border-radius: 9px;
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.model-dd-option:hover,
+.model-dd-option:focus-visible {
+  background: rgba(168, 85, 247, 0.18);
+  color: #fff;
+  outline: none;
+}
+
+.model-dd-option.is-selected {
+  background: linear-gradient(135deg, #a855f7, #7c3aed);
+  color: #fff;
+  font-weight: 800;
 }
